@@ -20,8 +20,44 @@ export default function TokenPage() {
           </p>
 
           <p style={{ marginTop: 8, fontSize: 14, opacity: 0.75 }}>
-            Contract address, charts, and live market data
-            will be published here at launch.
+            Live market data below is shown using Solana (SOL)
+            as a placeholder example.
+          </p>
+        </div>
+      </section>
+
+      {/* LIVE TOKEN DATA (DEXSCREENER) */}
+      <section style={{ marginTop: 56 }}>
+        <h2 className="section-title">Live Token Data (Example)</h2>
+
+        <div className="panel">
+          <p style={{ marginBottom: 16, opacity: 0.8 }}>
+            This chart demonstrates how MegaGrok token data
+            will be displayed after launch.
+          </p>
+
+          <div
+            style={{
+              width: "100%",
+              height: 420,
+              borderRadius: 12,
+              overflow: "hidden",
+              border: "2px solid #ff7a00"
+            }}
+          >
+            <iframe
+              src="https://dexscreener.com/solana/So11111111111111111111111111111111111111112?embed=1&theme=dark"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              allowFullScreen
+            />
+          </div>
+
+          <p style={{ marginTop: 12, fontSize: 13, opacity: 0.65 }}>
+            Placeholder data shown using SOL.
+            This will be replaced with the MegaGrok token
+            at launch.
           </p>
         </div>
       </section>
@@ -104,27 +140,6 @@ export default function TokenPage() {
               DEV_WALLET_ADDRESS_PLACEHOLDER
             </span>
           </p>
-        </div>
-      </section>
-
-      {/* LIVE DATA PLACEHOLDER */}
-      <section style={{ marginTop: 56 }}>
-        <h2 className="section-title">Live Token Data</h2>
-
-        <div className="panel">
-          <p>
-            Live token metrics will appear here after launch.
-          </p>
-
-          <p style={{ marginTop: 12, opacity: 0.75 }}>
-            This section will include:
-          </p>
-
-          <ul style={{ marginTop: 12, paddingLeft: 18, opacity: 0.75 }}>
-            <li>Price chart</li>
-            <li>Liquidity information</li>
-            <li>Market links (Dexscreener)</li>
-          </ul>
         </div>
       </section>
     </main>
