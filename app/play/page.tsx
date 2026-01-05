@@ -1,110 +1,114 @@
-export default function PlayPage() {
+export default function RPGSystemsPage() {
   return (
     <main className="container">
       {/* HERO */}
       <section className="hero">
-        <h1>TELEGRAM RPG</h1>
+        <h1>RPG SYSTEMS</h1>
         <p>
-          MegaGrok begins inside Telegram — where your Grok is born,
-          evolves, and becomes part of a living universe.
+          A deeper look into how the MegaGrok Telegram RPG works —
+          the systems, logic, and philosophy behind progression.
         </p>
       </section>
 
-      {/* OVERVIEW */}
+      {/* PHILOSOPHY */}
       <section>
-        <h2 className="section-title">What is the MegaGrok RPG?</h2>
+        <h2 className="section-title">Core Design Philosophy</h2>
 
-        <p style={{ maxWidth: 900, marginBottom: 24 }}>
-          The MegaGrok Telegram RPG is a persistent, character-driven game
-          played directly inside Telegram.
-        </p>
-
-        <p style={{ maxWidth: 900 }}>
-          You awaken a Grok, develop its stats, battle enemies, challenge
-          other players, and progress through evolutions that permanently
-          define your character.
-        </p>
+        <div className="panel">
+          <p>
+            MegaGrok is built around persistence. Your Grok is not disposable,
+            seasonal, or reset-based. Decisions compound over time, and long-term
+            identity matters more than short-term optimization.
+          </p>
+        </div>
       </section>
 
-      {/* HOW IT WORKS */}
+      {/* EVOLUTION */}
       <section style={{ marginTop: 48 }}>
-        <h2 className="section-title">How it works</h2>
+        <h2 className="section-title">Evolution System</h2>
 
         <div className="grid">
           <div className="panel">
-            <h3>Persistent Character</h3>
+            <h3>Meaningful Stages</h3>
             <p>
-              Your Grok is permanent. There are no seasonal wipes or resets —
-              decisions compound over time.
+              Groks evolve through multiple stages. Evolutions are not cosmetic —
+              they define strengths, weaknesses, and how your Grok plays.
             </p>
           </div>
 
           <div className="panel">
-            <h3>Evolutions</h3>
+            <h3>Permanent Identity</h3>
             <p>
-              Groks evolve through meaningful stages that define playstyle,
-              strengths, and long-term identity.
-            </p>
-          </div>
-
-          <div className="panel">
-            <h3>PvE & PvP</h3>
-            <p>
-              Battle enemies to progress, or challenge other players in
-              risk-driven PvP encounters.
-            </p>
-          </div>
-
-          <div className="panel">
-            <h3>Connected Ecosystem</h3>
-            <p>
-              Your RPG progress feeds into Arena competition, community canon,
-              and future ecosystem rewards.
+              Evolution paths are intentional. Choices are designed to matter
+              and are not meant to be changed casually.
             </p>
           </div>
         </div>
       </section>
 
-      {/* SYSTEMS LINK */}
-      <section style={{ marginTop: 56 }}>
+      {/* COMBAT */}
+      <section style={{ marginTop: 48 }}>
+        <h2 className="section-title">Combat Overview</h2>
+
+        <div className="grid">
+          <div className="panel">
+            <h3>Turn-Based & Tactical</h3>
+            <p>
+              Combat is decision-driven. Stats matter, but timing, awareness,
+              and understanding your Grok’s role matter just as much.
+            </p>
+          </div>
+
+          <div className="panel">
+            <h3>PvE vs PvP</h3>
+            <p>
+              PvE focuses on progression and challenge. PvP introduces risk,
+              mind games, and competition between Groks.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* BALANCE */}
+      <section style={{ marginTop: 48 }}>
+        <h2 className="section-title">Progression & Balance</h2>
+
         <div className="panel">
-          <h3>Want to go deeper?</h3>
           <p>
-            If you want to understand the RPG systems, evolution logic,
-            and combat philosophy in detail, explore the systems overview.
+            Progression is intentionally paced. Cooldowns, limits, and balance
+            systems exist to prevent abuse and reward consistency over spam.
           </p>
 
-          <a
-            href="/play/systems"
-            style={{
-              marginTop: 14,
-              display: "inline-block",
-              fontWeight: 800,
-              color: "#ff7a00"
-            }}
-          >
-            → View RPG Systems & Mechanics
-          </a>
+          <p style={{ marginTop: 12 }}>
+            MegaGrok is designed so skill and commitment outperform brute-force
+            grinding.
+          </p>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ECOSYSTEM */}
+      <section style={{ marginTop: 48 }}>
+        <h2 className="section-title">Connection to the Ecosystem</h2>
+
+        <div className="panel">
+          <p>
+            The Telegram RPG is the foundation of the MegaGrok universe.
+            Characters are born here, and their identity feeds into Arena
+            competition, community canon, and future ecosystem rewards.
+          </p>
+        </div>
+      </section>
+
+      {/* BACK LINK */}
       <section style={{ marginTop: 64 }}>
         <a
-          href="https://t.me/megagrok"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="panel"
+          href="/play"
           style={{
-            textAlign: "center",
-            borderColor: "#ff7a00"
+            fontWeight: 800,
+            color: "#ff7a00"
           }}
         >
-          <h3>Play on Telegram</h3>
-          <p>
-            Jump directly into the MegaGrok RPG.
-            No installation required — just open Telegram and begin.
-          </p>
+          ← Back to Telegram RPG overview
         </a>
       </section>
     </main>
