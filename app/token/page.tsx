@@ -10,8 +10,24 @@ export default function TokenPage() {
         </p>
       </section>
 
-      {/* OVERVIEW */}
+      {/* TOKEN STATUS */}
       <section>
+        <div className="panel">
+          <h3>Token Status</h3>
+
+          <p style={{ marginTop: 8 }}>
+            The MegaGrok token has not yet launched.
+          </p>
+
+          <p style={{ marginTop: 8, fontSize: 14, opacity: 0.75 }}>
+            Contract address, charts, and live market data
+            will be published here at launch.
+          </p>
+        </div>
+      </section>
+
+      {/* OVERVIEW */}
+      <section style={{ marginTop: 56 }}>
         <div className="panel">
           <p>
             The MegaGrok token is designed to support the ecosystem —
@@ -109,21 +125,6 @@ export default function TokenPage() {
             <li>Liquidity information</li>
             <li>Market links (Dexscreener)</li>
           </ul>
-        </div>
-      </section>
-
-      {/* STATUS */}
-      <section style={{ marginTop: 64 }}>
-        <div className="panel">
-          <h3>Token Status</h3>
-          <p style={{ marginTop: 8 }}>
-            The MegaGrok token has not yet launched.
-          </p>
-
-          <p style={{ marginTop: 8, fontSize: 14, opacity: 0.75 }}>
-            Contract address, charts, and live data
-            will be published here at launch.
-          </p>
         </div>
       </section>
     </main>
