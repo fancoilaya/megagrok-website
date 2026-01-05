@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { startArenaGame } from "../game/arena/Game";
+import { startArenaGame } from "@/game/arena/Game";
 
 export default function ArenaPlayPage() {
   useEffect(() => {
