@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
@@ -6,7 +6,6 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
-    // Placeholder assets (replace later)
     this.load.image("grok", "/arena/grok-placeholder.png");
     this.load.image("arena-floor", "/arena/floor-placeholder.png");
   }
