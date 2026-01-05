@@ -14,7 +14,7 @@ export default class Player {
 
   attackKey: Phaser.Input.Keyboard.Key;
 
-  speed = 260;
+  speed = 350;
   attackCooldown = 350;
   lastAttack = 0;
 
@@ -28,11 +28,11 @@ export default class Player {
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    // Scale & layering
-    this.sprite.setScale(0.5);
+    // Scale & layering (smaller, snappier)
+    this.sprite.setScale(0.32);
     this.sprite.setDepth(10);
 
-    // === GROUND SHADOW (IMPORTANT) ===
+    // === GROUND SHADOW ===
     this.shadow = scene.add.ellipse(
       x,
       y + 18,
@@ -92,18 +92,52 @@ export default class Player {
   }
 
   performAttack() {
-    // Simple feedback (v1)
+    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+
+    // Determine strike direction
+    let dirX = 0;
+    let dirY = 0;
+
+    if (body.velocity.x !== 0 || body.velocity.y !== 0) {
+      dirX = Math.sign(body.velocity.x);
+      dirY = Math.sign(body.velocity.y);
+    } else {
+      // Default forward strike
+      dirY = 1;
+    }
+
+    // === LUNGE FORWARD ===
     this.scene.tweens.add({
       targets: this.sprite,
-      scale: 0.55,
+      x: this.sprite.x + dirX * 12,
+      y: this.sprite.y + dirY * 12,
       duration: 80,
+      ease: "Power2",
       yoyo: true
     });
 
+    // === SCALE PUNCH ===
+    this.scene.tweens.add({
+      targets: this.sprite,
+      scale: 0.46,
+      duration: 60,
+      yoyo: true
+    });
+
+    // === HIT FLASH ===
     this.scene.tweens.add({
       targets: this.sprite,
       alpha: 0.7,
-      duration: 50,
+      duration: 40,
+      yoyo: true
+    });
+
+    // === SHADOW REACTION ===
+    this.scene.tweens.add({
+      targets: this.shadow,
+      scaleX: 0.8,
+      scaleY: 0.8,
+      duration: 60,
       yoyo: true
     });
   }
