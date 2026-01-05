@@ -7,7 +7,7 @@ export default class BootScene extends Phaser.Scene {
 
   preload() {
     this.load.image("grok", "/arena/grok-placeholder.png");
-    this.load.image("arena-floor", "/arena/floor-placeholder.png");
+    this.load.image("arena-floor", "/arena/arena-bg.png");
   }
 
   create() {
