@@ -5,8 +5,8 @@ export default function HomePage() {
       <section className="hero">
         <h1>MEGAGROK</h1>
         <p>
-          A living universe where players evolve, compete,
-          and shape a shared story.
+          A living universe where players evolve,
+          compete, and shape a shared story.
         </p>
       </section>
 
@@ -44,53 +44,6 @@ export default function HomePage() {
             <p>
               Utility-driven economics connecting
               gameplay, competition, and rewards.
-            </p>
-          </a>
-        </div>
-      </section>
-
-      {/* COMMUNITY */}
-      <section style={{ marginTop: 64 }}>
-        <h2 className="section-title">Join the Community</h2>
-
-        <div className="grid">
-          <a
-            href="https://t.me/megagrok"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="panel"
-          >
-            <h3>Telegram</h3>
-            <p>
-              The heart of MegaGrok.
-              Play the RPG, participate in PvP,
-              and evolve your Grok.
-            </p>
-          </a>
-
-          <a
-            href="https://x.com/MegaGrokdev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="panel"
-          >
-            <h3>X (Twitter)</h3>
-            <p>
-              Official announcements, updates,
-              and major ecosystem events.
-            </p>
-          </a>
-
-          <a
-            href="https://x.com/i/communities/2006355799371575305"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="panel"
-          >
-            <h3>X Community</h3>
-            <p>
-              Join discussions, theories,
-              and community-driven lore.
             </p>
           </a>
         </div>
