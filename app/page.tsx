@@ -1,119 +1,134 @@
 export default function HomePage() {
   return (
     <>
-      {/* HERO */}
-      <section style={{ padding: "64px 24px" }}>
-        <h1 style={{ fontSize: 42 }}>MegaGrok</h1>
+      {/* HERO / ATMOSPHERE */}
+      <section
+        style={{
+          position: "relative",
+          padding: "96px 24px 72px",
+          backgroundImage: `
+            linear-gradient(
+              to bottom,
+              rgba(11,11,15,0.6),
+              rgba(11,11,15,0.95)
+            ),
+            url('/images/hero-bg.jpg')
+          `,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          borderBottom: "1px solid #1f1f2a"
+        }}
+      >
+        <div style={{ maxWidth: 720 }}>
+          <h1
+            style={{
+              fontSize: 44,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase"
+            }}
+          >
+            MegaGrok
+          </h1>
 
-        <p style={{ marginTop: 16, fontSize: 18, maxWidth: 520 }}>
-          A living universe where players evolve, compete,
-          and shape a shared story.
-        </p>
-
-        <a
-          href="#pillars"
-          style={{
-            display: "inline-block",
-            marginTop: 32,
-            padding: "14px 22px",
-            background: "#6cf",
-            color: "#000",
-            borderRadius: 8,
-            fontWeight: 600
-          }}
-        >
-          Enter the Universe
-        </a>
+          <p
+            style={{
+              marginTop: 20,
+              fontSize: 18,
+              maxWidth: 520,
+              opacity: 0.9
+            }}
+          >
+            A living universe where players evolve, compete,
+            and shape a shared story.
+          </p>
+        </div>
       </section>
 
       {/* PILLARS */}
       <section
-        id="pillars"
         style={{
-          padding: "64px 24px",
-          borderTop: "1px solid #1f1f2a"
+          padding: "72px 24px",
+          background: "#0b0b0f"
         }}
       >
-        <h2 style={{ fontSize: 28 }}>The MegaGrok Ecosystem</h2>
-
-        <div
-          style={{
-            marginTop: 32,
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: 20,
-            maxWidth: 720
-          }}
-        >
-          {/* RPG */}
-          <a
-            href="/play"
+        <div style={{ maxWidth: 900 }}>
+          <h2
             style={{
-              padding: 20,
-              borderRadius: 12,
-              border: "1px solid #1f1f2a",
-              background: "#111118"
+              fontSize: 30,
+              letterSpacing: "0.04em",
+              marginBottom: 32
             }}
           >
-            <h3>Telegram RPG</h3>
-            <p style={{ marginTop: 8, opacity: 0.85 }}>
-              Grow a persistent Grok through battles, evolution,
-              and daily interaction — all inside Telegram.
-            </p>
-          </a>
+            The MegaGrok Ecosystem
+          </h2>
 
-          {/* ARENA */}
-          <a
-            href="/arena"
+          <div
             style={{
-              padding: 20,
-              borderRadius: 12,
-              border: "1px solid #1f1f2a",
-              background: "#111118"
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gap: 24
             }}
           >
-            <h3>The Arena</h3>
-            <p style={{ marginTop: 8, opacity: 0.85 }}>
-              Compete in fast-paced web battles, climb the
-              daily leaderboard, and earn real rewards.
-            </p>
-          </a>
+            {/* TELEGRAM RPG */}
+            <a href="/play" style={pillarCardStyle}>
+              <h3 style={pillarTitleStyle}>Telegram RPG</h3>
+              <p style={pillarTextStyle}>
+                Awaken a persistent Grok inside Telegram.
+                Progress, battle, and evolve through long-term systems
+                that define your identity.
+              </p>
+            </a>
 
-          {/* COMIC */}
-          <a
-            href="/comic"
-            style={{
-              padding: 20,
-              borderRadius: 12,
-              border: "1f1f2a",
-              background: "#111118"
-            }}
-          >
-            <h3>Community Comic</h3>
-            <p style={{ marginTop: 8, opacity: 0.85 }}>
-              A shared canon shaped by player actions.
-              Characters, events, and history are born here.
-            </p>
-          </a>
+            {/* ARENA */}
+            <a href="/arena" style={pillarCardStyle}>
+              <h3 style={pillarTitleStyle}>The Arena</h3>
+              <p style={pillarTextStyle}>
+                Short, intense web battles with daily leaderboard resets.
+                Compete for dominance and earn real ecosystem rewards.
+              </p>
+            </a>
 
-          {/* TOKEN */}
-          <a
-            href="/token"
-            style={{
-              padding: 20,
-              borderRadius: 12,
-              border: "1px solid #1f1f2a",
-              background: "#111118"
-            }}
-          >
-            <h3>The Token</h3>
-            <p style={{ marginTop: 8, opacity: 0.85 }}>
-              Utility-driven economy connecting the RPG,
-              Arena rewards, and future ecosystem mechanics.
-            </p>
-          </a>
+            {/* COMIC */}
+            <a href="/comic" style={pillarCardStyle}>
+              <h3 style={pillarTitleStyle}>Community Comic</h3>
+              <p style={pillarTextStyle}>
+                A living canon shaped by player actions.
+                Characters, events, and history are forged together.
+              </p>
+            </a>
+
+            {/* TOKEN */}
+            <a href="/token" style={pillarCardStyle}>
+              <h3 style={pillarTitleStyle}>The Token</h3>
+              <p style={pillarTextStyle}>
+                A utility-driven economy connecting gameplay,
+                competition, and future ecosystem mechanics.
+              </p>
+            </a>
+          </div>
         </div>
       </section>
     </>
   );
 }
+
+/* ───────────────── STYLES ───────────────── */
+
+const pillarCardStyle: React.CSSProperties = {
+  padding: 28,
+  background: "#111118",
+  borderRadius: 16,
+  border: "1px solid #1f1f2a",
+  textDecoration: "none"
+};
+
+const pillarTitleStyle: React.CSSProperties = {
+  fontSize: 22,
+  letterSpacing: "0.04em",
+  marginBottom: 10
+};
+
+const pillarTextStyle: React.CSSProperties = {
+  opacity: 0.85,
+  lineHeight: 1.5
+};
