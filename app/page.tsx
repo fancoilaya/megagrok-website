@@ -18,35 +18,109 @@ export default function HomePage() {
           <a href="/play" className="panel">
             <h3>Telegram RPG</h3>
             <p>
-              Awaken a persistent Grok inside Telegram.
-              Progress, battle, and evolve through long-term systems
-              that define your identity.
+              Persistent Groks, evolution, PvE and PvP —
+              all inside Telegram.
             </p>
           </a>
 
           <a href="/arena" className="panel">
             <h3>The Arena</h3>
             <p>
-              Short, intense web battles with daily leaderboard resets.
-              Compete for dominance and earn real ecosystem rewards.
+              Daily competitive battles with public leaderboards
+              and future rewards.
             </p>
           </a>
 
           <a href="/comic" className="panel">
-            <h3>Community Comic</h3>
+            <h3>The Comic</h3>
             <p>
-              A living canon shaped by player actions.
-              Characters, events, and history are forged together.
+              The canonical origin and evolving story
+              shaped by player actions.
             </p>
           </a>
 
           <a href="/token" className="panel">
             <h3>The Token</h3>
             <p>
-              A utility-driven economy connecting gameplay,
-              competition, and future ecosystem mechanics.
+              Utility-driven economics connecting
+              gameplay, competition, and rewards.
             </p>
           </a>
+        </div>
+      </section>
+
+      {/* COMMUNITY */}
+      <section style={{ marginTop: 64 }}>
+        <h2 className="section-title">Join the Community</h2>
+
+        <div className="grid">
+          <a
+            href="https://t.me/megagrok"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="panel"
+          >
+            <h3>Telegram</h3>
+            <p>
+              The heart of MegaGrok.
+              Play the RPG, participate in PvP,
+              and evolve your Grok.
+            </p>
+          </a>
+
+          <a
+            href="https://x.com/MegaGrokdev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="panel"
+          >
+            <h3>X (Twitter)</h3>
+            <p>
+              Official announcements, updates,
+              and major ecosystem events.
+            </p>
+          </a>
+
+          <a
+            href="https://x.com/i/communities/2006355799371575305"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="panel"
+          >
+            <h3>X Community</h3>
+            <p>
+              Join discussions, theories,
+              and community-driven lore.
+            </p>
+          </a>
+        </div>
+      </section>
+
+      {/* TOKENOMICS PLACEHOLDER */}
+      <section style={{ marginTop: 64 }}>
+        <h2 className="section-title">Tokenomics</h2>
+
+        <div className="panel">
+          <p>
+            Live tokenomics will be published here
+            once the MegaGrok token launches.
+          </p>
+
+          <p style={{ marginTop: 12, fontSize: 14, opacity: 0.75 }}>
+            This section will include:
+          </p>
+
+          <ul style={{ marginTop: 12, paddingLeft: 18, opacity: 0.75 }}>
+            <li>Contract Address (CA)</li>
+            <li>Supply & allocation</li>
+            <li>Pump.fun link</li>
+            <li>Live token metrics</li>
+          </ul>
+
+          <p style={{ marginTop: 12, fontSize: 13, opacity: 0.6 }}>
+            No token has launched yet.
+            Details will be added transparently at launch.
+          </p>
         </div>
       </section>
     </main>
