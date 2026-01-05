@@ -113,9 +113,28 @@ export default function Navbar() {
             <Link href="/roadmap" onClick={() => setOpen(false)}>
               Roadmap
             </Link>
+
+            {/* SOCIALS */}
+            <a
+              href="https://x.com/MegaGrokdev"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+            >
+              X (Official)
+            </a>
+
+            <a
+              href="https://x.com/i/communities/2006355799371575305"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+            >
+              X Community
+            </a>
           </nav>
 
-          {/* PRIMARY CTA (FUTURE) */}
+          {/* PRIMARY CTA */}
           <div style={{ marginTop: 48 }}>
             <a
               href="https://t.me/megagrok"
