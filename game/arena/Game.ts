@@ -1,13 +1,16 @@
-import Phaser from "phaser";
-import BootScene from "./scenes/BootScene";
-import ArenaScene from "./scenes/ArenaScene";
+let Phaser: typeof import("phaser");
 
-let game: Phaser.Game | null = null;
+export async function startArenaGame() {
+  if (typeof window === "undefined") return;
 
-export function startArenaGame() {
-  if (game) return;
+  if (!Phaser) {
+    Phaser = (await import("phaser")).default;
+  }
 
-  game = new Phaser.Game({
+  const { default: BootScene } = await import("./scenes/BootScene");
+  const { default: ArenaScene } = await import("./scenes/ArenaScene");
+
+  new Phaser.Game({
     type: Phaser.AUTO,
     parent: "arena-game",
     width: window.innerWidth,
@@ -15,9 +18,7 @@ export function startArenaGame() {
     backgroundColor: "#060414",
     physics: {
       default: "arcade",
-      arcade: {
-        debug: false
-      }
+      arcade: { debug: false }
     },
     scale: {
       mode: Phaser.Scale.RESIZE,
