@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 import Player from "../entities/Player";
 
 export default class ArenaScene extends Phaser.Scene {
@@ -27,7 +27,7 @@ export default class ArenaScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, width, height);
   }
 
-  update(_, delta: number) {
+  update(_: number, delta: number) {
     this.player.update(delta);
   }
 }
