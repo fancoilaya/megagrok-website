@@ -1,4 +1,51 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+/* ---------------------------------------------------------
+   Countdown logic — next reset at 00:00 UTC
+--------------------------------------------------------- */
+function getTimeUntilNextUTCReset() {
+  const now = new Date();
+
+  const nextReset = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + 1,
+      0,
+      0,
+      0
+    )
+  );
+
+  const diff = nextReset.getTime() - now.getTime();
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  return {
+    hours: String(hours).padStart(2, "0"),
+    minutes: String(minutes).padStart(2, "0"),
+    seconds: String(seconds).padStart(2, "0"),
+  };
+}
+
+/* ---------------------------------------------------------
+   Arena Page
+--------------------------------------------------------- */
 export default function ArenaPage() {
+  const [time, setTime] = useState(getTimeUntilNextUTCReset());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(getTimeUntilNextUTCReset());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main className="container">
       {/* HERO */}
@@ -10,12 +57,39 @@ export default function ArenaPage() {
         </p>
       </section>
 
+      {/* UNDER CONSTRUCTION NOTICE */}
+      <section style={{ marginTop: 32 }}>
+        <div
+          className="panel"
+          style={{
+            borderColor: "#ff7a00",
+            background: "rgba(18, 6, 40, 0.98)"
+          }}
+        >
+          <h3>⚠ Arena Rebuild in Progress</h3>
+          <p style={{ marginTop: 8 }}>
+            The Arena game is currently being rebuilt from the ground up.
+            The competitive system, leaderboard, and reward mechanics are
+            already live — gameplay will be reintroduced once the new version
+            is ready.
+          </p>
+
+          <p style={{ marginTop: 8, fontSize: 14, opacity: 0.75 }}>
+            Daily resets, leaderboard history, and rewards will persist
+            across versions.
+          </p>
+        </div>
+      </section>
+
       {/* RESET COUNTDOWN */}
-      <section>
+      <section style={{ marginTop: 56 }}>
         <h2 className="section-title">Next Reset</h2>
 
         <div className="panel" style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 14, opacity: 0.8 }}>Leaderboard resets in</p>
+          <p style={{ fontSize: 14, opacity: 0.8 }}>
+            Leaderboard resets in
+          </p>
+
           <div
             style={{
               fontFamily: "Anton, sans-serif",
@@ -24,8 +98,9 @@ export default function ArenaPage() {
               marginTop: 8
             }}
           >
-            04 : 12 : 33
+            {time.hours} : {time.minutes} : {time.seconds}
           </div>
+
           <p style={{ marginTop: 8, fontSize: 13, opacity: 0.7 }}>
             Reset occurs daily at 00:00 UTC
           </p>
@@ -55,7 +130,12 @@ export default function ArenaPage() {
             </thead>
             <tbody>
               {[...Array(10)].map((_, i) => (
-                <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                <tr
+                  key={i}
+                  style={{
+                    borderTop: "1px solid rgba(255,255,255,0.06)"
+                  }}
+                >
                   <td>{i + 1}</td>
                   <td>—</td>
                   <td align="right">—</td>
@@ -78,10 +158,11 @@ export default function ArenaPage() {
 
         <div className="panel">
           <p>
-            Arena rewards are derived from ecosystem activity and creator inflows.
+            Arena rewards are derived from ecosystem activity
+            and creator inflows.
           </p>
 
-          <p style={{ marginTop: 12, opacity: 0.8 }}>
+          <p style={{ marginTop: 12 }}>
             Reward Status: <strong>Inactive</strong>
           </p>
 
@@ -105,14 +186,14 @@ export default function ArenaPage() {
         <h2 className="section-title">Arena Champions</h2>
 
         <div className="panel">
-          <p style={{ marginBottom: 12 }}>
-            Recent daily winners will appear here once the Arena goes live.
+          <p>
+            Daily winners will be archived here once the Arena goes live.
           </p>
 
-          <ul style={{ paddingLeft: 18, fontSize: 14, opacity: 0.75 }}>
+          <ul style={{ marginTop: 12, paddingLeft: 18, opacity: 0.75 }}>
             <li>— No history yet</li>
             <li>— Arena launching soon</li>
-            <li>— Compete to become the first champion</li>
+            <li>— Be the first champion</li>
           </ul>
         </div>
       </section>
@@ -125,7 +206,7 @@ export default function ArenaPage() {
             The Arena game is currently under reconstruction.
           </p>
           <p style={{ marginTop: 8, fontSize: 14, opacity: 0.7 }}>
-            Gameplay will be reintroduced once the system is finalized.
+            Gameplay will return once the new system is complete.
           </p>
         </div>
       </section>
