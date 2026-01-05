@@ -1,59 +1,91 @@
 export default function PlayPage() {
   return (
-    <section style={{ padding: "64px 24px", maxWidth: 720 }}>
-      {/* HEADER */}
-      <h1 style={{ fontSize: 36 }}>Telegram RPG</h1>
+    <main className="container">
+      {/* HERO */}
+      <section className="hero">
+        <h1>TELEGRAM RPG</h1>
+        <p>
+          MegaGrok begins inside Telegram — where your Grok is born,
+          evolves, and becomes part of a living universe.
+        </p>
+      </section>
 
-      <p style={{ marginTop: 16, fontSize: 18, opacity: 0.9 }}>
-        MegaGrok begins inside Telegram — where your Grok is born,
-        evolves, and becomes part of a living universe.
-      </p>
+      {/* OVERVIEW */}
+      <section>
+        <h2 className="section-title">What is the MegaGrok RPG?</h2>
 
-      {/* WHAT IT IS */}
-      <section style={{ marginTop: 48 }}>
-        <h2 style={{ fontSize: 24 }}>What is it?</h2>
-
-        <p style={{ marginTop: 12, opacity: 0.85 }}>
+        <p style={{ maxWidth: 900, marginBottom: 24 }}>
           The MegaGrok Telegram RPG is a persistent, character-driven game
           played directly inside Telegram.
         </p>
 
-        <p style={{ marginTop: 12, opacity: 0.85 }}>
-          You awaken a Grok, develop its stats, battle enemies,
-          challenge other players, and progress through evolutions
-          that permanently define your character.
+        <p style={{ maxWidth: 900 }}>
+          You awaken a Grok, develop its stats, battle enemies, challenge
+          other players, and progress through evolutions that permanently
+          define your character.
         </p>
       </section>
 
       {/* HOW IT WORKS */}
       <section style={{ marginTop: 48 }}>
-        <h2 style={{ fontSize: 24 }}>How it works</h2>
+        <h2 className="section-title">How it works</h2>
 
-        <ul style={{ marginTop: 16, paddingLeft: 20, opacity: 0.85 }}>
-          <li>Awaken your Grok inside Telegram</li>
-          <li>Train, battle, and evolve over time</li>
-          <li>Engage in PvE and PvP encounters</li>
-          <li>Unlock evolutions and progression paths</li>
-          <li>Your progress persists — this is not a reset game</li>
-        </ul>
+        <div className="grid">
+          <div className="panel">
+            <h3>Persistent Character</h3>
+            <p>
+              Your Grok is permanent. There are no seasonal wipes or resets —
+              decisions compound over time.
+            </p>
+          </div>
+
+          <div className="panel">
+            <h3>Evolutions</h3>
+            <p>
+              Groks evolve through meaningful stages that define playstyle,
+              strengths, and long-term identity.
+            </p>
+          </div>
+
+          <div className="panel">
+            <h3>PvE & PvP</h3>
+            <p>
+              Battle enemies to progress, or challenge other players in
+              risk-driven PvP encounters.
+            </p>
+          </div>
+
+          <div className="panel">
+            <h3>Connected Ecosystem</h3>
+            <p>
+              Your RPG progress feeds into Arena competition, community canon,
+              and future ecosystem rewards.
+            </p>
+          </div>
+        </div>
       </section>
 
-      {/* WHY IT MATTERS */}
-      <section style={{ marginTop: 48 }}>
-        <h2 style={{ fontSize: 24 }}>Why it matters</h2>
+      {/* SYSTEMS LINK */}
+      <section style={{ marginTop: 56 }}>
+        <div className="panel">
+          <h3>Want to go deeper?</h3>
+          <p>
+            If you want to understand the RPG systems, evolution logic,
+            and combat philosophy in detail, explore the systems overview.
+          </p>
 
-        <p style={{ marginTop: 12, opacity: 0.85 }}>
-          Your Grok is more than a stat sheet.
-        </p>
-
-        <p style={{ marginTop: 12, opacity: 0.85 }}>
-          Actions taken in the RPG influence the wider MegaGrok ecosystem —
-          from Arena competition to future comic canon and NFT derivations.
-        </p>
-
-        <p style={{ marginTop: 12, opacity: 0.85 }}>
-          This is where identity is formed.
-        </p>
+          <a
+            href="/play/systems"
+            style={{
+              marginTop: 14,
+              display: "inline-block",
+              fontWeight: 800,
+              color: "#ff7a00"
+            }}
+          >
+            → View RPG Systems & Mechanics
+          </a>
+        </div>
       </section>
 
       {/* CTA */}
@@ -62,23 +94,19 @@ export default function PlayPage() {
           href="https://t.me/megagrok"
           target="_blank"
           rel="noopener noreferrer"
+          className="panel"
           style={{
-            display: "inline-block",
-            padding: "16px 24px",
-            background: "#6cf",
-            color: "#000",
-            borderRadius: 8,
-            fontWeight: 600,
-            fontSize: 18
+            textAlign: "center",
+            borderColor: "#ff7a00"
           }}
         >
-          Play on Telegram
+          <h3>Play on Telegram</h3>
+          <p>
+            Jump directly into the MegaGrok RPG.
+            No installation required — just open Telegram and begin.
+          </p>
         </a>
-
-        <p style={{ marginTop: 16, fontSize: 14, opacity: 0.6 }}>
-          Opens Telegram • No installation required
-        </p>
       </section>
-    </section>
+    </main>
   );
 }
