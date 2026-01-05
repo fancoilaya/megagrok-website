@@ -18,18 +18,34 @@ export default class Player {
   attackCooldown = 350;
   lastAttack = 0;
 
+  shadow: Phaser.GameObjects.Ellipse;
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
-    // Player sprite
+    // === PLAYER SPRITE ===
     this.sprite = scene.physics.add
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    // Arrow keys
+    // Scale & layering
+    this.sprite.setScale(0.5);
+    this.sprite.setDepth(10);
+
+    // === GROUND SHADOW (IMPORTANT) ===
+    this.shadow = scene.add.ellipse(
+      x,
+      y + 18,
+      60,
+      22,
+      0x000000,
+      0.35
+    );
+    this.shadow.setDepth(5);
+
+    // === INPUT ===
     this.cursors = scene.input.keyboard!.createCursorKeys();
 
-    // WASD keys
     this.keys = scene.input.keyboard!.addKeys({
       W: Phaser.Input.Keyboard.KeyCodes.W,
       A: Phaser.Input.Keyboard.KeyCodes.A,
@@ -37,7 +53,6 @@ export default class Player {
       D: Phaser.Input.Keyboard.KeyCodes.D
     }) as any;
 
-    // Attack key
     this.attackKey = scene.input.keyboard!.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
@@ -47,24 +62,22 @@ export default class Player {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
 
-    // Horizontal movement
+    // === MOVEMENT ===
     if (this.cursors.left?.isDown || this.keys.A.isDown) {
       body.setVelocityX(-this.speed);
     } else if (this.cursors.right?.isDown || this.keys.D.isDown) {
       body.setVelocityX(this.speed);
     }
 
-    // Vertical movement
     if (this.cursors.up?.isDown || this.keys.W.isDown) {
       body.setVelocityY(-this.speed);
     } else if (this.cursors.down?.isDown || this.keys.S.isDown) {
       body.setVelocityY(this.speed);
     }
 
-    // Normalize diagonal movement
     body.velocity.normalize().scale(this.speed);
 
-    // Attack
+    // === ATTACK ===
     if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
       const now = this.scene.time.now;
       if (now - this.lastAttack > this.attackCooldown) {
@@ -72,14 +85,25 @@ export default class Player {
         this.performAttack();
       }
     }
+
+    // === SYNC SHADOW ===
+    this.shadow.x = this.sprite.x;
+    this.shadow.y = this.sprite.y + 18;
   }
 
   performAttack() {
-    // Simple attack feedback (placeholder)
+    // Simple feedback (v1)
     this.scene.tweens.add({
       targets: this.sprite,
-      scale: 1.1,
+      scale: 0.55,
       duration: 80,
+      yoyo: true
+    });
+
+    this.scene.tweens.add({
+      targets: this.sprite,
+      alpha: 0.7,
+      duration: 50,
       yoyo: true
     });
   }
