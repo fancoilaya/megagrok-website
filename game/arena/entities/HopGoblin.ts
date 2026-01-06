@@ -21,9 +21,19 @@ export default class HopGoblin extends Enemy {
     this.contactDamage = 5;
     this.killPoints = 120;
 
-    // === VISUAL PLACEHOLDER (REPLACE WITH ART LATER) ===
-    this.sprite.setScale(0.32);
-    this.sprite.setTint(0x66ff66); // green goblin vibe
+    // === USE REAL ART ===
+    this.sprite.setTexture("hopgoblin");
+    this.sprite.setScale(0.22);
+    this.sprite.setOrigin(0.5, 0.65); // feet weighted
+
+    // Idle wiggle (life!)
+    scene.tweens.add({
+      targets: this.sprite,
+      angle: { from: -2, to: 2 },
+      duration: 800,
+      yoyo: true,
+      repeat: -1
+    });
   }
 
   update(player: Phaser.Physics.Arcade.Sprite) {
@@ -35,7 +45,6 @@ export default class HopGoblin extends Enemy {
 
     const stopDistance = 26;
 
-    // === HOP BEHAVIOR ===
     if (dist > stopDistance) {
       if (now - this.lastHop > this.hopCooldown) {
         this.lastHop = now;
@@ -43,17 +52,17 @@ export default class HopGoblin extends Enemy {
         const nx = dx / dist;
         const ny = dy / dist;
 
-        // Hop impulse
+        // === HOP IMPULSE ===
         this.sprite.setVelocity(
           nx * this.speed * 1.4,
           ny * this.speed * 1.4
         );
 
-        // Hop squash & stretch
+        // === HOP ANIMATION ===
         this.scene.tweens.add({
           targets: this.sprite,
-          scaleX: 0.36,
-          scaleY: 0.28,
+          scaleX: 0.26,
+          scaleY: 0.18,
           duration: 80,
           yoyo: true
         });
@@ -61,13 +70,13 @@ export default class HopGoblin extends Enemy {
     } else {
       this.sprite.setVelocity(0, 0);
 
-      // Deal contact damage
+      // Contact damage
       (player as any).getData?.("ref")?.takeDamage(this.contactDamage);
     }
 
     // === HP BAR & DEPTH ===
-    this.hpBarBg.setPosition(this.sprite.x, this.sprite.y - 18);
-    this.hpBar.setPosition(this.sprite.x, this.sprite.y - 18);
+    this.hpBarBg.setPosition(this.sprite.x, this.sprite.y - 22);
+    this.hpBar.setPosition(this.sprite.x, this.sprite.y - 22);
 
     this.sprite.setDepth(this.sprite.y);
     this.hpBarBg.setDepth(this.sprite.y + 1);
