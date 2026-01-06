@@ -8,24 +8,24 @@ export default class ArenaScene extends Phaser.Scene {
   enemies!: EnemyManager;
   hud!: HUD;
 
-  wave = 1;
-  points = 0;
+  wave: number = 1;
+  points: number = 0;
 
   constructor() {
     super("ArenaScene");
   }
 
-  create() {
+  create(): void {
     const { width, height } = this.scale;
 
-    // === ARENA FLOOR ===
+    // === BACKGROUND ===
     this.add
       .image(width / 2, height / 2, "arena-floor")
       .setDisplaySize(width, height);
 
     this.physics.world.setBounds(0, 0, width, height);
 
-    // === ENEMIES MANAGER ===
+    // === ENEMIES ===
     this.enemies = new EnemyManager(this);
 
     // === PLAYER ===
@@ -36,15 +36,15 @@ export default class ArenaScene extends Phaser.Scene {
       this.enemies
     );
 
-    // Allow enemies to damage player safely
+    // Allow enemies to damage player
     this.player.sprite.setData("ref", this.player);
 
-    // === SCORING ===
-    this.enemies.onEnemyKilled = (points: number) => {
-      this.points += points;
+    // === SCORE HOOK ===
+    this.enemies.onEnemyKilled = (pts: number) => {
+      this.points += pts;
     };
 
-    // === TEMP: FIRST WAVE SPAWN ===
+    // === TEMP WAVE SPAWN ===
     this.enemies.spawnHopGoblin(200, 200);
     this.enemies.spawnHopGoblin(width - 200, 200);
     this.enemies.spawnHopGoblin(width / 2, height - 200);
@@ -61,7 +61,7 @@ export default class ArenaScene extends Phaser.Scene {
     );
   }
 
-  update(time: number, delta: number) {
+  update(_time: number, delta: number): void {
     this.player.update(delta);
     this.enemies.update(this.player.sprite);
 
@@ -70,39 +70,5 @@ export default class ArenaScene extends Phaser.Scene {
       this.wave,
       this.points
     );
-  }
-}
-
-
-    // === ENEMIES ===
-    this.enemies = new EnemyManager(this);
-
-    // Wire points to enemy kills
-    this.enemies.onEnemyKilled = (points: number) => {
-      this.points += points;
-    };
-
-    // Temporary test spawns (will be replaced by wave system)
-    this.enemies.spawnHopGoblin(200, 200);
-    this.enemies.spawnHopGoblin(width - 200, 200);
-    this.enemies.spawnHopGoblin(width / 2, height - 200);
-
-    // === HUD ===
-    this.hud = new HUD(this);
-
-    // === CAMERA ===
-    this.cameras.main.startFollow(this.player.sprite, true, 0.08, 0.08);
-  }
-
-  update(time: number, delta: number) {
-    // Update game entities
-    this.player.update(delta);
-    this.enemies.update(this.player.sprite);
-
-    // Sync player HP to HUD
-    this.playerHp = this.player.hp;
-
-    // Update HUD
-    this.hud.update(this.playerHp, this.wave, this.points);
   }
 }
