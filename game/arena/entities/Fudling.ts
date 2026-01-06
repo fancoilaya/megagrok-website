@@ -10,7 +10,7 @@ export default class Fudling extends Enemy {
   ) {
     super(scene, x, y, onDeath);
 
-    // === TIER 1 FAST RUSHER ===
+    // === TIER 1 FAST RUSHER === 
     this.maxHp = 16;
     this.hp = 16;
     this.defense = 0;
