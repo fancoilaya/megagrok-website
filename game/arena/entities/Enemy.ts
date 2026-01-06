@@ -24,6 +24,8 @@ export default class Enemy {
     const dy = player.y - this.sprite.y;
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
 
+    this.sprite.setDepth(this.sprite.y);
+
     this.sprite.setVelocity(
       (dx / len) * this.speed,
       (dy / len) * this.speed
