@@ -8,7 +8,6 @@ export default class ArenaScene extends Phaser.Scene {
   enemies!: EnemyManager;
   hud!: HUD;
 
-  // Temporary state (will become real systems later)
   wave = 1;
   points = 0;
   playerHp = 100;
@@ -29,6 +28,11 @@ export default class ArenaScene extends Phaser.Scene {
     this.player = new Player(this, width / 2, height / 2);
     this.enemies = new EnemyManager(this);
 
+    // Wire points to kills
+    this.enemies.onEnemyKilled = (points: number) => {
+      this.points += points;
+    };
+
     this.enemies.spawn(200, 200);
     this.enemies.spawn(width - 200, 200);
     this.enemies.spawn(width / 2, height - 200);
@@ -42,7 +46,6 @@ export default class ArenaScene extends Phaser.Scene {
     this.player.update(delta);
     this.enemies.update(this.player.sprite);
 
-    // Update HUD (values are static for now)
     this.hud.update(this.playerHp, this.wave, this.points);
   }
 }
