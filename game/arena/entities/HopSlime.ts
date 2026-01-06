@@ -23,7 +23,7 @@ export default class HopSlime extends Enemy {
     this.killPoints = 140;
 
     this.sprite.setTexture("hopslime");
-    this.sprite.setScale(0.28);
+    this.sprite.setScale(0.196);
     this.sprite.setOrigin(0.5, 0.6);
   }
 
