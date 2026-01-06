@@ -42,9 +42,9 @@ export default class ArenaScene extends Phaser.Scene {
     };
 
     // Temporary test spawns (will be replaced by wave system)
-    this.enemies.spawn(200, 200);
-    this.enemies.spawn(width - 200, 200);
-    this.enemies.spawn(width / 2, height - 200);
+    this.enemies.spawnHopGoblin(200, 200);
+    this.enemies.spawnHopGoblin(width - 200, 200);
+    this.enemies.spawnHopGoblin(width / 2, height - 200);
 
     // === HUD ===
     this.hud = new HUD(this);
