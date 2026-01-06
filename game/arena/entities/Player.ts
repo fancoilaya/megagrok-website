@@ -30,7 +30,7 @@ export default class Player {
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    this.sprite.setScale(0.38);
+    this.sprite.setScale(0.27);
     this.sprite.setData("ref", this);
 
     const keyboard =
