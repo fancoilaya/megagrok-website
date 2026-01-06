@@ -36,8 +36,11 @@ export default class Player {
     this.sprite.setDepth(this.sprite.y);
     this.sprite.setData("ref", this);
 
-    this.cursors = scene.input.keyboard.createCursorKeys();
-    this.keys = scene.input.keyboard.addKeys("W,A,S,D,SPACE");
+    // === KEYBOARD (NULL-SAFE ASSERTION) ===
+    const keyboard = scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+
+    this.cursors = keyboard.createCursorKeys();
+    this.keys = keyboard.addKeys("W,A,S,D,SPACE");
   }
 
   update(delta: number) {
@@ -46,10 +49,10 @@ export default class Player {
     let vx = 0;
     let vy = 0;
 
-    if (this.cursors.left.isDown || this.keys.A.isDown) vx = -1;
-    if (this.cursors.right.isDown || this.keys.D.isDown) vx = 1;
-    if (this.cursors.up.isDown || this.keys.W.isDown) vy = -1;
-    if (this.cursors.down.isDown || this.keys.S.isDown) vy = 1;
+    if (this.cursors.left?.isDown || this.keys.A?.isDown) vx = -1;
+    if (this.cursors.right?.isDown || this.keys.D?.isDown) vx = 1;
+    if (this.cursors.up?.isDown || this.keys.W?.isDown) vy = -1;
+    if (this.cursors.down?.isDown || this.keys.S?.isDown) vy = 1;
 
     body.setVelocity(vx * this.speed, vy * this.speed);
 
@@ -72,9 +75,7 @@ export default class Player {
     if (now - this.lastAttack < this.attackCooldown) return;
     this.lastAttack = now;
 
-    // Determine attack direction
-    let dirX = this.sprite.flipX ? -1 : 1;
-    let dirY = 0;
+    const dirX = this.sprite.flipX ? -1 : 1;
 
     const attackX = this.sprite.x + dirX * 28;
     const attackY = this.sprite.y;
@@ -101,7 +102,7 @@ export default class Player {
       onComplete: () => wave.destroy()
     });
 
-    // === PUNCH FEEL (SPRITE SNAP) ===
+    // === PUNCH SNAP ===
     this.scene.tweens.add({
       targets: this.sprite,
       x: this.sprite.x + dirX * 6,
@@ -147,7 +148,6 @@ export default class Player {
   takeDamage(amount: number) {
     this.hp = Math.max(0, this.hp - amount);
 
-    // Hit flash
     this.scene.tweens.add({
       targets: this.sprite,
       alpha: 0.7,
