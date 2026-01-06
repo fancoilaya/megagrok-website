@@ -30,9 +30,10 @@ export default class Player {
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
+    this.sprite.body.setImmovable(true);
+
     this.sprite.setScale(0.35);
     this.sprite.setDepth(10);
-    this.sprite.body.setImmovable(true);
 
     this.shadow = scene.add.ellipse(
       x,
