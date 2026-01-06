@@ -11,10 +11,9 @@ export default class Player {
   hp = 100;
   maxHp = 100;
 
-  // === ATTACK ===
-  attackCooldown = 420;
+  attackCooldown = 450;
   lastAttack = 0;
-  attackRange = 80; // ⬅️ increased range
+  attackRange = 78;
 
   enemyManager: EnemyManager;
 
@@ -31,18 +30,17 @@ export default class Player {
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    (this.sprite.body as Phaser.Physics.Arcade.Body).setImmovable(true);
-
     this.sprite.setScale(0.38);
     this.sprite.setDepth(this.sprite.y);
     this.sprite.setData("ref", this);
 
-    const keyboard = scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+    const keyboard =
+      scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
     this.cursors = keyboard.createCursorKeys();
     this.keys = keyboard.addKeys("W,A,S,D,SPACE");
   }
 
-  update(delta: number) {
+  update(_delta: number) {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
     let vx = 0;
@@ -73,60 +71,70 @@ export default class Player {
     this.lastAttack = now;
 
     const dirX = this.sprite.flipX ? -1 : 1;
+    const dirAngle = dirX < 0 ? Math.PI : 0;
 
-    // === VISUAL ORIGIN (FURTHER OUT) ===
-    const waveX = this.sprite.x + dirX * 42;
-    const waveY = this.sprite.y;
-
-    // === ENERGY SHOCKWAVE ===
-    const wave = this.scene.add.rectangle(
-      waveX,
-      waveY,
-      56, // width = reach
-      16, // height = force thickness
-      0xff3b3b,
-      0.45
-    );
-
-    wave.setDepth(this.sprite.y + 1);
-    wave.rotation = dirX < 0 ? Math.PI : 0;
-
-    this.scene.tweens.add({
-      targets: wave,
-      scaleX: 1.8,
-      alpha: 0,
-      duration: 140,
-      onComplete: () => wave.destroy()
-    });
-
-    // === BODY SNAP (SELL FORCE) ===
+    // === WIND-UP (VERY SHORT) ===
     this.scene.tweens.add({
       targets: this.sprite,
-      x: this.sprite.x + dirX * 8,
-      duration: 70,
+      angle: dirX * -6,
+      duration: 80,
       yoyo: true
     });
 
-    // === HIT DETECTION (RANGE-BASED) ===
-    const enemy = this.enemyManager.getClosestEnemy(
+    // === FORCE ARC VISUAL ===
+    const arc = this.scene.add.graphics();
+    arc.setDepth(this.sprite.y + 2);
+
+    arc.fillStyle(0xff5555, 0.55);
+    arc.beginPath();
+    arc.moveTo(this.sprite.x, this.sprite.y);
+    arc.arc(
       this.sprite.x,
+      this.sprite.y,
+      72,
+      dirAngle - Phaser.Math.DegToRad(35),
+      dirAngle + Phaser.Math.DegToRad(35)
+    );
+    arc.closePath();
+    arc.fillPath();
+
+    // Fade & expand slightly
+    this.scene.tweens.add({
+      targets: arc,
+      alpha: 0,
+      scale: 1.15,
+      duration: 120,
+      onComplete: () => arc.destroy()
+    });
+
+    // === HIT STOP (IMPACT) ===
+    this.scene.time.timeScale = 0.92;
+    this.scene.time.delayedCall(40, () => {
+      this.scene.time.timeScale = 1;
+    });
+
+    // === DAMAGE ===
+    const enemy = this.enemyManager.getClosestEnemy(
+      this.sprite.x + dirX * 40,
       this.sprite.y,
       this.attackRange
     );
 
     if (enemy) {
-      const dmg = Phaser.Math.Between(8, 14);
+      const dmg = Phaser.Math.Between(9, 15);
       enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
 
       // Damage number
       const dmgText = this.scene.add.text(
         enemy.sprite.x,
-        enemy.sprite.y - 20,
+        enemy.sprite.y - 18,
         `-${dmg}`,
         {
           fontSize: "14px",
-          color: "#ff4b4b",
-          fontFamily: "monospace"
+          fontFamily: "monospace",
+          color: "#ff6666",
+          stroke: "#000000",
+          strokeThickness: 2
         }
       );
 
@@ -134,9 +142,9 @@ export default class Player {
 
       this.scene.tweens.add({
         targets: dmgText,
-        y: dmgText.y - 18,
+        y: dmgText.y - 20,
         alpha: 0,
-        duration: 500,
+        duration: 520,
         onComplete: () => dmgText.destroy()
       });
     }
@@ -147,8 +155,8 @@ export default class Player {
 
     this.scene.tweens.add({
       targets: this.sprite,
-      alpha: 0.7,
-      duration: 40,
+      alpha: 0.6,
+      duration: 60,
       yoyo: true
     });
   }
