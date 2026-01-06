@@ -259,3 +259,4 @@ export default class ArenaScene extends Phaser.Scene {
     }
   }
 }
+
