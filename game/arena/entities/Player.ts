@@ -15,7 +15,7 @@ export default class Player {
 
   attackKey: Phaser.Input.Keyboard.Key;
 
-  speed = 320;
+  speed = 360;
   attackRange = 55;
   attackCooldown = 350;
   lastAttack = 0;
@@ -30,7 +30,7 @@ export default class Player {
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    this.sprite.setScale(0.42);
+    this.sprite.setScale(0.35);
     this.sprite.setDepth(10);
     this.sprite.body.setImmovable(true);
 
