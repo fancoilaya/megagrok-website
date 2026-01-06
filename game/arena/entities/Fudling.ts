@@ -19,7 +19,7 @@ export default class Fudling extends Enemy {
     this.killPoints = 110;
 
     this.sprite.setTexture("fudling");
-    this.sprite.setScale(0.24);
+    this.sprite.setScale(0.168);
     this.sprite.setOrigin(0.5, 0.6);
   }
 
