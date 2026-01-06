@@ -23,7 +23,7 @@ export default class HopGoblin extends Enemy {
 
     // === REAL ART ===
     this.sprite.setTexture("hopgoblin");
-    this.sprite.setScale(0.22);
+    this.sprite.setScale(0.16);
     this.sprite.setOrigin(0.5, 0.65); // feet weighted
 
     // Idle wiggle (life)
