@@ -4,8 +4,9 @@ export default class Enemy {
   scene: Phaser.Scene;
   sprite: Phaser.Physics.Arcade.Sprite;
 
-  maxHp = 30;
-  hp = 30;
+  maxHp = 40;
+  hp = 40;
+  defense = 2; // flat damage reduction
   speed = 120;
 
   hpBarBg: Phaser.GameObjects.Rectangle;
@@ -20,7 +21,7 @@ export default class Enemy {
 
     this.sprite.setScale(0.35);
 
-    // === HP BAR ===
+    // HP bar
     this.hpBarBg = scene.add.rectangle(x, y - 18, 28, 4, 0x000000);
     this.hpBar = scene.add.rectangle(x, y - 18, 28, 4, 0xff3333);
 
@@ -43,24 +44,23 @@ export default class Enemy {
       this.sprite.setVelocity(0, 0);
     }
 
-    // === UPDATE HP BAR POSITION ===
     this.hpBarBg.setPosition(this.sprite.x, this.sprite.y - 18);
     this.hpBar.setPosition(this.sprite.x, this.sprite.y - 18);
 
-    // === DEPTH SORT ===
     this.sprite.setDepth(this.sprite.y);
     this.hpBarBg.setDepth(this.sprite.y + 1);
     this.hpBar.setDepth(this.sprite.y + 2);
   }
 
-  takeDamage(amount: number, fromX: number, fromY: number) {
-    this.hp -= amount;
+  takeDamage(rawDamage: number, fromX: number, fromY: number) {
+    const finalDamage = Math.max(1, rawDamage - this.defense);
+    this.hp -= finalDamage;
 
-    // === FLOATING DAMAGE TEXT ===
+    // Floating damage text
     const dmgText = this.scene.add.text(
       this.sprite.x,
       this.sprite.y - 28,
-      `-${amount}`,
+      `-${finalDamage}`,
       {
         fontFamily: "monospace",
         fontSize: "14px",
@@ -77,11 +77,10 @@ export default class Enemy {
       y: dmgText.y - 16,
       alpha: 0,
       duration: 500,
-      ease: "Power1",
       onComplete: () => dmgText.destroy()
     });
 
-    // === KNOCKBACK (ATTACK ONLY) ===
+    // Knockback (attack only)
     const dx = this.sprite.x - fromX;
     const dy = this.sprite.y - fromY;
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -91,7 +90,7 @@ export default class Enemy {
       (dy / len) * 160
     );
 
-    // === HIT FLASH ===
+    // Hit flash
     this.scene.tweens.add({
       targets: this.sprite,
       alpha: 0.6,
@@ -99,7 +98,7 @@ export default class Enemy {
       yoyo: true
     });
 
-    // === HP BAR UPDATE ===
+    // HP bar update
     const hpRatio = Phaser.Math.Clamp(this.hp / this.maxHp, 0, 1);
     this.hpBar.width = 28 * hpRatio;
 
