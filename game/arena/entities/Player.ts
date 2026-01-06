@@ -14,7 +14,7 @@ export default class Player {
 
   attackKey: Phaser.Input.Keyboard.Key;
 
-  speed = 350;
+  speed = 360;
   attackCooldown = 350;
   lastAttack = 0;
 
@@ -28,8 +28,8 @@ export default class Player {
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    // Scale & layering (smaller, snappier)
-    this.sprite.setScale(0.32);
+    // Scale & layering
+    this.sprite.setScale(0.30);
     this.sprite.setDepth(10);
 
     // === GROUND SHADOW ===
@@ -94,7 +94,7 @@ export default class Player {
   performAttack() {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
-    // Determine strike direction
+    // === DETERMINE STRIKE DIRECTION ===
     let dirX = 0;
     let dirY = 0;
 
@@ -102,11 +102,10 @@ export default class Player {
       dirX = Math.sign(body.velocity.x);
       dirY = Math.sign(body.velocity.y);
     } else {
-      // Default forward strike
-      dirY = 1;
+      dirY = 1; // default forward strike
     }
 
-    // === LUNGE FORWARD ===
+    // === STRIKE LUNGE ===
     this.scene.tweens.add({
       targets: this.sprite,
       x: this.sprite.x + dirX * 12,
@@ -140,5 +139,13 @@ export default class Player {
       duration: 60,
       yoyo: true
     });
+
+    // === APPLY DAMAGE ===
+    (this.scene as any).enemies?.damageAt(
+      this.sprite.x + dirX * 20,
+      this.sprite.y + dirY * 20,
+      40,
+      15
+    );
   }
 }
