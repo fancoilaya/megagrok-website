@@ -36,7 +36,7 @@ export default class Player {
     this.sprite.setDepth(this.sprite.y);
     this.sprite.setData("ref", this);
 
-    // === KEYBOARD (NULL-SAFE ASSERTION) ===
+    // === KEYBOARD (NULL-SAFE) ===
     const keyboard = scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
 
     this.cursors = keyboard.createCursorKeys();
@@ -119,7 +119,7 @@ export default class Player {
 
     if (enemy) {
       const dmg = Phaser.Math.Between(8, 14);
-      enemy.takeDamage(dmg);
+      enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
 
       // Damage number
       const dmgText = this.scene.add.text(
