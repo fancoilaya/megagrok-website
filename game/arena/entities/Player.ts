@@ -15,14 +15,17 @@ export default class Player {
 
   attackKey: Phaser.Input.Keyboard.Key;
 
+  // === MOVEMENT ===
   speed = 320;
+
+  // === ATTACK ===
   attackRange = 55;
   attackCooldown = 350;
   lastAttack = 0;
-
   attackMin = 10;
   attackMax = 18;
 
+  // === HP / DAMAGE ===
   maxHp = 100;
   hp = 100;
   damageCooldown = 800;
@@ -33,12 +36,14 @@ export default class Player {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
+    // === SPRITE ===
     this.sprite = scene.physics.add
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
     this.sprite.setScale(0.42);
 
+    // === SHADOW ===
     this.shadow = scene.add.ellipse(
       x,
       y + 18,
@@ -48,6 +53,7 @@ export default class Player {
       0.35
     );
 
+    // === INPUT ===
     this.cursors = scene.input.keyboard!.createCursorKeys();
     this.keys = scene.input.keyboard!.addKeys({
       W: Phaser.Input.Keyboard.KeyCodes.W,
@@ -65,6 +71,7 @@ export default class Player {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
 
+    // === MOVEMENT ===
     if (this.cursors.left?.isDown || this.keys.A.isDown)
       body.setVelocityX(-this.speed);
     else if (this.cursors.right?.isDown || this.keys.D.isDown)
@@ -77,7 +84,7 @@ export default class Player {
 
     body.velocity.normalize().scale(this.speed);
 
-    // Attack
+    // === ATTACK ===
     if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
       const now = this.scene.time.now;
       if (now - this.lastAttack > this.attackCooldown) {
@@ -86,6 +93,7 @@ export default class Player {
       }
     }
 
+    // === DEPTH + SHADOW ===
     this.sprite.setDepth(this.sprite.y);
     this.shadow.setDepth(this.sprite.y - 1);
     this.shadow.x = this.sprite.x;
@@ -95,6 +103,7 @@ export default class Player {
   performAttack() {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
+    // === ATTACK DIRECTION ===
     let dirX = 0;
     let dirY = 1;
 
@@ -103,38 +112,42 @@ export default class Player {
       dirY = Math.sign(body.velocity.y);
     }
 
-    const strikeX = this.sprite.x + dirX * 26;
-    const strikeY = this.sprite.y + dirY * 26;
+    const strikeX = this.sprite.x + dirX * 28;
+    const strikeY = this.sprite.y + dirY * 28;
 
-    // Punch animation
+    // === BODY LEAN (SELL PUNCH) ===
     this.scene.tweens.add({
       targets: this.sprite,
-      scaleX: 0.48,
-      scaleY: 0.38,
-      duration: 50,
+      angle: dirX !== 0 ? dirX * 8 : 0,
+      duration: 40,
       yoyo: true
     });
 
-    // Slash visual
-    const slash = this.scene.add.rectangle(
+    // === FIST / HIT FLASH ===
+    const punch = this.scene.add.circle(
       strikeX,
       strikeY,
-      30,
-      10,
+      6,
       0xffffff,
-      0.25
+      0.9
     );
-    slash.setRotation(Math.atan2(dirY, dirX));
-    slash.setDepth(1000);
+    punch.setDepth(2000);
 
     this.scene.tweens.add({
-      targets: slash,
+      targets: punch,
+      scale: 2,
       alpha: 0,
-      scaleX: 1.6,
       duration: 120,
-      onComplete: () => slash.destroy()
+      onComplete: () => punch.destroy()
     });
 
+    // === HIT STOP (IMPACT) ===
+    this.scene.time.timeScale = 0.9;
+    this.scene.time.delayedCall(60, () => {
+      this.scene.time.timeScale = 1;
+    });
+
+    // === DAMAGE LOGIC ===
     const manager = (this.scene as any).enemies;
     if (!manager) return;
 
