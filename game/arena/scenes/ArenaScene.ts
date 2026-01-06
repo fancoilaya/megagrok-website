@@ -63,8 +63,10 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
+    // ✅ PLAYER CAN ALWAYS MOVE
+    this.player.update(delta);
+
     if (this.state === "active") {
-      this.player.update(delta);
       this.enemies.update(this.player.sprite);
 
       // === PLAYER DEATH ===
@@ -251,47 +253,7 @@ export default class ArenaScene extends Phaser.Scene {
         break;
 
       default:
-        // Loop Wave 3 for now
-        this.spawnWave(3);
-        break;
-    }
-  }
-}
-
-    });
-  }
-
-  // =========================
-  // WAVE COMPOSITION
-  // =========================
-
-  spawnWave(wave: number) {
-    const w = this.scale.width;
-    const h = this.scale.height;
-
-    switch (wave) {
-      case 1:
-        this.enemies.spawnHopGoblin(200, 200);
-        this.enemies.spawnHopGoblin(w - 200, 200);
-        this.enemies.spawnHopGoblin(w / 2, h - 200);
-        break;
-
-      case 2:
-        this.enemies.spawnHopGoblin(200, 200);
-        this.enemies.spawnHopGoblin(w - 200, 200);
-        this.enemies.spawnFudling(w / 2, h - 180);
-        this.enemies.spawnFudling(w / 2, 180);
-        break;
-
-      case 3:
-        this.enemies.spawnHopGoblin(180, 180);
-        this.enemies.spawnHopGoblin(w - 180, 180);
-        this.enemies.spawnHopSlime(w / 2, h - 180);
-        this.enemies.spawnHopSlime(w / 2, 180);
-        this.enemies.spawnFudling(w / 2, h / 2);
-        break;
-
-      default:
+        // Loop wave 3 for now
         this.spawnWave(3);
         break;
     }
