@@ -26,19 +26,12 @@ export default class Player {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
-    // === PLAYER SPRITE ===
     this.sprite = scene.physics.add
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    // IMPORTANT: prevent player from being pushed by enemies
-    (this.sprite.body as Phaser.Physics.Arcade.Body).setImmovable(true);
-
-    // Scale & depth
     this.sprite.setScale(0.42);
-    this.sprite.setDepth(10);
 
-    // === GROUND SHADOW ===
     this.shadow = scene.add.ellipse(
       x,
       y + 18,
@@ -47,9 +40,7 @@ export default class Player {
       0x000000,
       0.35
     );
-    this.shadow.setDepth(5);
 
-    // === INPUT ===
     this.cursors = scene.input.keyboard!.createCursorKeys();
 
     this.keys = scene.input.keyboard!.addKeys({
@@ -68,7 +59,7 @@ export default class Player {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
 
-    // === MOVEMENT ===
+    // Movement
     if (this.cursors.left?.isDown || this.keys.A.isDown)
       body.setVelocityX(-this.speed);
     else if (this.cursors.right?.isDown || this.keys.D.isDown)
@@ -81,7 +72,24 @@ export default class Player {
 
     body.velocity.normalize().scale(this.speed);
 
-    // === ATTACK ===
+    // Prevent walking through enemies
+    const manager = (this.scene as any).enemies;
+    if (manager) {
+      for (const enemy of manager.enemies) {
+        const d = Phaser.Math.Distance.Between(
+          this.sprite.x,
+          this.sprite.y,
+          enemy.sprite.x,
+          enemy.sprite.y
+        );
+        if (d < 26) {
+          body.setVelocity(0, 0);
+          break;
+        }
+      }
+    }
+
+    // Attack
     if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
       const now = this.scene.time.now;
       if (now - this.lastAttack > this.attackCooldown) {
@@ -90,11 +98,11 @@ export default class Player {
       }
     }
 
-    // === DEPTH SORTING ===
+    // Depth sorting
     this.sprite.setDepth(this.sprite.y);
     this.shadow.setDepth(this.sprite.y - 1);
 
-    // === SYNC SHADOW ===
+    // Sync shadow
     this.shadow.x = this.sprite.x;
     this.shadow.y = this.sprite.y + 18;
   }
@@ -102,7 +110,6 @@ export default class Player {
   performAttack() {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
-    // === STRIKE DIRECTION ===
     let dirX = 0;
     let dirY = 1;
 
@@ -114,7 +121,7 @@ export default class Player {
     const strikeX = this.sprite.x + dirX * 20;
     const strikeY = this.sprite.y + dirY * 20;
 
-    // === VISUAL STRIKE FX ===
+    // Visual hit
     const hitFx = this.scene.add.circle(
       strikeX,
       strikeY,
@@ -132,7 +139,7 @@ export default class Player {
       onComplete: () => hitFx.destroy()
     });
 
-    // === PLAYER LUNGE ===
+    // Lunge
     this.scene.tweens.add({
       targets: this.sprite,
       x: this.sprite.x + dirX * 10,
@@ -141,7 +148,7 @@ export default class Player {
       yoyo: true
     });
 
-    // === FIND & DAMAGE ONE ENEMY ===
+    // Damage one enemy
     const manager = (this.scene as any).enemies;
     if (!manager) return;
 
