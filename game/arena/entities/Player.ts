@@ -4,7 +4,7 @@ import EnemyManager from "../systems/EnemyManager";
 export default class Player {
   scene: Phaser.Scene;
   sprite: Phaser.Physics.Arcade.Sprite;
-  cursors: Phaser.TypesInput.Keyboard.CursorKeys;
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   keys: any;
 
   speed = 260;
@@ -13,7 +13,7 @@ export default class Player {
 
   attackCooldown = 460;
   lastAttack = 0;
-  attackRange = 105; // ⬅️ increased again (feels fair)
+  attackRange = 105;
 
   enemyManager: EnemyManager;
 
@@ -35,6 +35,7 @@ export default class Player {
 
     const keyboard =
       scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+
     this.cursors = keyboard.createCursorKeys();
     this.keys = keyboard.addKeys("W,A,S,D,SPACE");
   }
@@ -68,7 +69,7 @@ export default class Player {
     if (now - this.lastAttack < this.attackCooldown) return;
     this.lastAttack = now;
 
-    // === FIND TARGET FIRST ===
+    // Find target first
     const target = this.enemyManager.getClosestEnemy(
       this.sprite.x,
       this.sprite.y,
@@ -85,12 +86,12 @@ export default class Player {
       );
     }
 
-    // === OFFSET ORIGIN FOR VISUAL (IMPORTANT) ===
+    // Offset forward so slash is not centered on player
     const offsetDistance = 55;
     const originX = this.sprite.x + Math.cos(angle) * offsetDistance;
     const originY = this.sprite.y + Math.sin(angle) * offsetDistance;
 
-    // === WIND-UP (SHORT) ===
+    // Wind-up
     this.scene.tweens.add({
       targets: this.sprite,
       angle: Phaser.Math.RadToDeg(angle) * 0.04,
@@ -98,11 +99,11 @@ export default class Player {
       yoyo: true
     });
 
-    // === SLASH BAND VISUAL ===
+    // Slash band visual
     const gfx = this.scene.add.graphics();
     gfx.setDepth(this.sprite.y + 6);
 
-    // Outer glow band
+    // Glow band
     gfx.lineStyle(18, 0xff8888, 0.35);
     gfx.beginPath();
     gfx.arc(
@@ -114,7 +115,7 @@ export default class Player {
     );
     gfx.strokePath();
 
-    // Core slash band
+    // Core slash
     gfx.lineStyle(10, 0xff2222, 0.95);
     gfx.beginPath();
     gfx.arc(
@@ -126,7 +127,6 @@ export default class Player {
     );
     gfx.strokePath();
 
-    // Animate slash
     this.scene.tweens.add({
       targets: gfx,
       alpha: 0,
@@ -135,13 +135,13 @@ export default class Player {
       onComplete: () => gfx.destroy()
     });
 
-    // === HIT STOP ===
+    // Hit stop
     this.scene.time.timeScale = 0.9;
     this.scene.time.delayedCall(45, () => {
       this.scene.time.timeScale = 1;
     });
 
-    // === DAMAGE ===
+    // Damage
     if (target) {
       const dmg = Phaser.Math.Between(11, 17);
       target.takeDamage(dmg, this.sprite.x, this.sprite.y);
