@@ -11,9 +11,10 @@ export default class Player {
   hp = 100;
   maxHp = 100;
 
+  // === ATTACK ===
   attackCooldown = 420;
   lastAttack = 0;
-  attackRange = 58;
+  attackRange = 80; // ⬅️ increased range
 
   enemyManager: EnemyManager;
 
@@ -36,9 +37,7 @@ export default class Player {
     this.sprite.setDepth(this.sprite.y);
     this.sprite.setData("ref", this);
 
-    // === KEYBOARD (NULL-SAFE) ===
     const keyboard = scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
-
     this.cursors = keyboard.createCursorKeys();
     this.keys = keyboard.addKeys("W,A,S,D,SPACE");
   }
@@ -56,15 +55,13 @@ export default class Player {
 
     body.setVelocity(vx * this.speed, vy * this.speed);
 
-    // === FACING (LEFT / RIGHT) ===
+    // Facing
     if (vx !== 0) {
       this.sprite.setFlipX(vx < 0);
     }
 
-    // Depth follows Y
     this.sprite.setDepth(this.sprite.y);
 
-    // === ATTACK ===
     if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
       this.performAttack();
     }
@@ -77,15 +74,16 @@ export default class Player {
 
     const dirX = this.sprite.flipX ? -1 : 1;
 
-    const attackX = this.sprite.x + dirX * 28;
-    const attackY = this.sprite.y;
+    // === VISUAL ORIGIN (FURTHER OUT) ===
+    const waveX = this.sprite.x + dirX * 42;
+    const waveY = this.sprite.y;
 
-    // === ENERGY WAVE VISUAL ===
-    const wave = this.scene.add.ellipse(
-      attackX,
-      attackY,
-      34,
-      18,
+    // === ENERGY SHOCKWAVE ===
+    const wave = this.scene.add.rectangle(
+      waveX,
+      waveY,
+      56, // width = reach
+      16, // height = force thickness
       0xff3b3b,
       0.45
     );
@@ -95,22 +93,21 @@ export default class Player {
 
     this.scene.tweens.add({
       targets: wave,
-      scaleX: 1.6,
-      scaleY: 1.2,
+      scaleX: 1.8,
       alpha: 0,
-      duration: 120,
+      duration: 140,
       onComplete: () => wave.destroy()
     });
 
-    // === PUNCH SNAP ===
+    // === BODY SNAP (SELL FORCE) ===
     this.scene.tweens.add({
       targets: this.sprite,
-      x: this.sprite.x + dirX * 6,
-      duration: 60,
+      x: this.sprite.x + dirX * 8,
+      duration: 70,
       yoyo: true
     });
 
-    // === HIT DETECTION ===
+    // === HIT DETECTION (RANGE-BASED) ===
     const enemy = this.enemyManager.getClosestEnemy(
       this.sprite.x,
       this.sprite.y,
