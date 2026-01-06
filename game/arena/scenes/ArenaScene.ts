@@ -3,7 +3,7 @@ import Player from "../entities/Player";
 import EnemyManager from "../systems/EnemyManager";
 import HUD from "../ui/HUD";
 
-type ArenaState = "spawning" | "active" | "between";
+type ArenaState = "spawning" | "active" | "between" | "dead";
 
 export default class ArenaScene extends Phaser.Scene {
   player!: Player;
@@ -45,7 +45,7 @@ export default class ArenaScene extends Phaser.Scene {
     // === HUD ===
     this.hud = new HUD(this);
 
-    // === SCORE CALLBACK ONLY ===
+    // === SCORE CALLBACK ===
     this.enemies.onEnemyKilled = (pts: number) => {
       this.points += pts;
     };
@@ -67,7 +67,13 @@ export default class ArenaScene extends Phaser.Scene {
       this.player.update(delta);
       this.enemies.update(this.player.sprite);
 
-      // ✅ WAVE COMPLETE CHECK (SAFE PLACE)
+      // === PLAYER DEATH ===
+      if (this.player.hp <= 0) {
+        this.onPlayerDeath();
+        return;
+      }
+
+      // === WAVE COMPLETE ===
       if (this.enemies.enemies.length === 0) {
         this.onWaveComplete();
       }
@@ -96,10 +102,9 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   onWaveComplete() {
-    if (this.state !== "active") return; // prevent double trigger
+    if (this.state !== "active") return;
 
     this.state = "between";
-
     this.showWaveText("Wave Complete!");
 
     this.time.delayedCall(1000, () => {
@@ -110,9 +115,7 @@ export default class ArenaScene extends Phaser.Scene {
   startCountdown(seconds: number) {
     this.countdown = seconds;
 
-    if (this.countdownText) {
-      this.countdownText.destroy();
-    }
+    this.countdownText?.destroy();
 
     this.countdownText = this.add
       .text(
@@ -176,6 +179,85 @@ export default class ArenaScene extends Phaser.Scene {
       duration: 900,
       delay: 600,
       onComplete: () => msg.destroy()
+    });
+  }
+
+  // =========================
+  // PLAYER DEATH
+  // =========================
+
+  onPlayerDeath() {
+    if (this.state === "dead") return;
+
+    this.state = "dead";
+    this.enemies.clearAll();
+    this.player.sprite.setVelocity(0, 0);
+
+    const msg = this.add
+      .text(
+        this.scale.width / 2,
+        this.scale.height / 2,
+        "YOU DIED\n\nPress SPACE to Restart",
+        {
+          fontSize: "36px",
+          color: "#ff3333",
+          fontFamily: "monospace",
+          align: "center",
+          stroke: "#000000",
+          strokeThickness: 5
+        }
+      )
+      .setOrigin(0.5)
+      .setDepth(1000)
+      .setScrollFactor(0);
+
+    const keyboard =
+      this.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+
+    keyboard.once("keydown-SPACE", () => {
+      msg.destroy();
+      this.scene.restart();
+    });
+  }
+
+  // =========================
+  // WAVE COMPOSITION
+  // =========================
+
+  spawnWave(wave: number) {
+    const w = this.scale.width;
+    const h = this.scale.height;
+
+    switch (wave) {
+      case 1:
+        this.enemies.spawnHopGoblin(200, 200);
+        this.enemies.spawnHopGoblin(w - 200, 200);
+        this.enemies.spawnHopGoblin(w / 2, h - 200);
+        break;
+
+      case 2:
+        this.enemies.spawnHopGoblin(200, 200);
+        this.enemies.spawnHopGoblin(w - 200, 200);
+        this.enemies.spawnFudling(w / 2, h - 180);
+        this.enemies.spawnFudling(w / 2, 180);
+        break;
+
+      case 3:
+        this.enemies.spawnHopGoblin(180, 180);
+        this.enemies.spawnHopGoblin(w - 180, 180);
+        this.enemies.spawnHopSlime(w / 2, h - 180);
+        this.enemies.spawnHopSlime(w / 2, 180);
+        this.enemies.spawnFudling(w / 2, h / 2);
+        break;
+
+      default:
+        // Loop Wave 3 for now
+        this.spawnWave(3);
+        break;
+    }
+  }
+}
+
     });
   }
 
