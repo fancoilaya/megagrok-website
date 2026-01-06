@@ -1,5 +1,6 @@
-import Enemy from "../entities/Enemy";
 import * as Phaser from "phaser";
+import Enemy from "../entities/Enemy";
+import HopGoblin from "../entities/HopGoblin";
 
 export default class EnemyManager {
   scene: Phaser.Scene;
@@ -11,8 +12,8 @@ export default class EnemyManager {
     this.scene = scene;
   }
 
-  spawn(x: number, y: number) {
-    const enemy = new Enemy(
+  spawnHopGoblin(x: number, y: number) {
+    const enemy = new HopGoblin(
       this.scene,
       x,
       y,
@@ -22,7 +23,6 @@ export default class EnemyManager {
         }
       }
     );
-
     this.enemies.push(enemy);
   }
 
