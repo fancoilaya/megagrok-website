@@ -85,6 +85,9 @@ export default class Player {
 
     this.shadow.x = this.sprite.x;
     this.shadow.y = this.sprite.y + 18;
+
+    this.sprite.setDepth(this.sprite.y);
+    this.shadow.setDepth(this.sprite.y - 1);
   }
 
   performAttack() {
