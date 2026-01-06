@@ -38,7 +38,6 @@ export default class Enemy {
     if (dist > stopDistance) {
       const nx = dx / dist;
       const ny = dy / dist;
-
       this.sprite.setVelocity(nx * this.speed, ny * this.speed);
     } else {
       this.sprite.setVelocity(0, 0);
@@ -56,6 +55,31 @@ export default class Enemy {
 
   takeDamage(amount: number, fromX: number, fromY: number) {
     this.hp -= amount;
+
+    // === FLOATING DAMAGE TEXT ===
+    const dmgText = this.scene.add.text(
+      this.sprite.x,
+      this.sprite.y - 28,
+      `-${amount}`,
+      {
+        fontFamily: "monospace",
+        fontSize: "14px",
+        color: "#ff4444",
+        stroke: "#000000",
+        strokeThickness: 2
+      }
+    );
+    dmgText.setOrigin(0.5);
+    dmgText.setDepth(1000);
+
+    this.scene.tweens.add({
+      targets: dmgText,
+      y: dmgText.y - 16,
+      alpha: 0,
+      duration: 500,
+      ease: "Power1",
+      onComplete: () => dmgText.destroy()
+    });
 
     // === KNOCKBACK (ATTACK ONLY) ===
     const dx = this.sprite.x - fromX;
