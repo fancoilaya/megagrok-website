@@ -18,6 +18,7 @@ export default class ArenaScene extends Phaser.Scene {
       .image(width / 2, height / 2, "arena-floor")
       .setDisplaySize(width, height);
 
+    // World bounds
     this.physics.world.setBounds(0, 0, width, height);
 
     // Player
@@ -26,7 +27,7 @@ export default class ArenaScene extends Phaser.Scene {
     // Enemies
     this.enemies = new EnemyManager(this);
 
-    // Spawn a few test enemies
+    // Spawn test enemies
     this.enemies.spawn(200, 200);
     this.enemies.spawn(width - 200, 200);
     this.enemies.spawn(width / 2, height - 200);
@@ -35,7 +36,7 @@ export default class ArenaScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite, true, 0.08, 0.08);
   }
 
-  update(_, delta: number) {
+  update(time: number, delta: number) {
     this.player.update(delta);
     this.enemies.update(this.player.sprite);
   }
