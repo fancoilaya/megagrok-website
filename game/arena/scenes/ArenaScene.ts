@@ -30,15 +30,15 @@ export default class ArenaScene extends Phaser.Scene {
     this.enemies.spawn(width - 200, 200);
     this.enemies.spawn(width / 2, height - 200);
 
-    // === COLLISION: PLAYER ↔ ENEMIES ===
+    // Player ↔ Enemy overlap (NO FORCE)
     for (const enemy of this.enemies.enemies) {
-      this.physics.add.collider(
+      this.physics.add.overlap(
         this.player.sprite,
-        enemy.sprite
+        enemy.sprite,
+        () => {}
       );
     }
 
-   
     // Camera
     this.cameras.main.startFollow(this.player.sprite, true, 0.08, 0.08);
   }
