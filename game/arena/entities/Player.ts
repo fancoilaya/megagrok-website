@@ -32,6 +32,7 @@ export default class Player {
 
     this.sprite.setScale(0.42);
     this.sprite.setDepth(10);
+    this.sprite.body.setImmovable(true);
 
     this.shadow = scene.add.ellipse(
       x,
