@@ -5,12 +5,24 @@ export default class EnemyManager {
   scene: Phaser.Scene;
   enemies: Enemy[] = [];
 
+  onEnemyKilled?: (points: number) => void;
+
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
   spawn(x: number, y: number) {
-    const enemy = new Enemy(this.scene, x, y);
+    const enemy = new Enemy(
+      this.scene,
+      x,
+      y,
+      (points: number) => {
+        if (this.onEnemyKilled) {
+          this.onEnemyKilled(points);
+        }
+      }
+    );
+
     this.enemies.push(enemy);
   }
 
@@ -22,7 +34,6 @@ export default class EnemyManager {
     }
   }
 
-  /** Returns the closest enemy within range */
   getClosestEnemy(
     x: number,
     y: number,
