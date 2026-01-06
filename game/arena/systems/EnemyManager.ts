@@ -22,7 +22,15 @@ export default class EnemyManager {
     }
   }
 
-  damageAt(x: number, y: number, radius: number, dmg: number) {
+  /** Returns the closest enemy within range */
+  getClosestEnemy(
+    x: number,
+    y: number,
+    range: number
+  ): Enemy | null {
+    let closest: Enemy | null = null;
+    let closestDist = range;
+
     for (const enemy of this.enemies) {
       const d = Phaser.Math.Distance.Between(
         x,
@@ -31,9 +39,12 @@ export default class EnemyManager {
         enemy.sprite.y
       );
 
-      if (d <= radius) {
-        enemy.takeDamage(dmg);
+      if (d < closestDist) {
+        closestDist = d;
+        closest = enemy;
       }
     }
+
+    return closest;
   }
 }
