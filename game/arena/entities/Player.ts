@@ -11,9 +11,9 @@ export default class Player {
   hp = 100;
   maxHp = 100;
 
-  attackCooldown = 460;
+  attackCooldown = 420;
   lastAttack = 0;
-  attackRange = 105;
+  attackRange = 120; // generous but fair
 
   enemyManager: EnemyManager;
 
@@ -69,106 +69,79 @@ export default class Player {
     if (now - this.lastAttack < this.attackCooldown) return;
     this.lastAttack = now;
 
-    // Find target first
-    const target = this.enemyManager.getClosestEnemy(
+    // === LOCK ON CLOSEST ENEMY ===
+    const enemy = this.enemyManager.getClosestEnemy(
       this.sprite.x,
       this.sprite.y,
       this.attackRange
     );
 
-    let angle = this.sprite.flipX ? Math.PI : 0;
-    if (target) {
-      angle = Phaser.Math.Angle.Between(
-        this.sprite.x,
-        this.sprite.y,
-        target.sprite.x,
-        target.sprite.y
-      );
-    }
+    if (!enemy) return;
 
-    // Offset forward so slash is not centered on player
-    const offsetDistance = 55;
-    const originX = this.sprite.x + Math.cos(angle) * offsetDistance;
-    const originY = this.sprite.y + Math.sin(angle) * offsetDistance;
+    const ex = enemy.sprite.x;
+    const ey = enemy.sprite.y;
 
-    // Wind-up
-    this.scene.tweens.add({
-      targets: this.sprite,
-      angle: Phaser.Math.RadToDeg(angle) * 0.04,
-      duration: 80,
-      yoyo: true
-    });
+    // === FACE TARGET ===
+    this.sprite.setFlipX(ex < this.sprite.x);
 
-    // Slash band visual
+    // === FORCE STRIKE VISUAL (LINE) ===
     const gfx = this.scene.add.graphics();
-    gfx.setDepth(this.sprite.y + 6);
+    gfx.setDepth(Math.max(this.sprite.y, ey) + 5);
 
-    // Glow band
-    gfx.lineStyle(18, 0xff8888, 0.35);
+    // Glow layer
+    gfx.lineStyle(6, 0xff8888, 0.35);
     gfx.beginPath();
-    gfx.arc(
-      originX,
-      originY,
-      48,
-      angle - Phaser.Math.DegToRad(30),
-      angle + Phaser.Math.DegToRad(30)
-    );
+    gfx.moveTo(this.sprite.x, this.sprite.y);
+    gfx.lineTo(ex, ey);
     gfx.strokePath();
 
-    // Core slash
-    gfx.lineStyle(10, 0xff2222, 0.95);
+    // Core strike
+    gfx.lineStyle(3, 0xff2222, 1);
     gfx.beginPath();
-    gfx.arc(
-      originX,
-      originY,
-      44,
-      angle - Phaser.Math.DegToRad(22),
-      angle + Phaser.Math.DegToRad(22)
-    );
+    gfx.moveTo(this.sprite.x, this.sprite.y);
+    gfx.lineTo(ex, ey);
     gfx.strokePath();
 
     this.scene.tweens.add({
       targets: gfx,
       alpha: 0,
-      scale: 1.15,
-      duration: 160,
+      duration: 120,
       onComplete: () => gfx.destroy()
     });
 
-    // Hit stop
-    this.scene.time.timeScale = 0.9;
-    this.scene.time.delayedCall(45, () => {
+    // === HIT STOP ===
+    this.scene.time.timeScale = 0.92;
+    this.scene.time.delayedCall(40, () => {
       this.scene.time.timeScale = 1;
     });
 
-    // Damage
-    if (target) {
-      const dmg = Phaser.Math.Between(11, 17);
-      target.takeDamage(dmg, this.sprite.x, this.sprite.y);
+    // === DAMAGE (SINGLE TARGET) ===
+    const dmg = Phaser.Math.Between(12, 18);
+    enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
 
-      const dmgText = this.scene.add.text(
-        target.sprite.x,
-        target.sprite.y - 22,
-        `-${dmg}`,
-        {
-          fontSize: "15px",
-          fontFamily: "monospace",
-          color: "#ff2222",
-          stroke: "#000000",
-          strokeThickness: 2
-        }
-      );
+    // Damage number
+    const dmgText = this.scene.add.text(
+      ex,
+      ey - 20,
+      `-${dmg}`,
+      {
+        fontSize: "15px",
+        fontFamily: "monospace",
+        color: "#ff2222",
+        stroke: "#000000",
+        strokeThickness: 2
+      }
+    );
 
-      dmgText.setDepth(target.sprite.y + 10);
+    dmgText.setDepth(ey + 10);
 
-      this.scene.tweens.add({
-        targets: dmgText,
-        y: dmgText.y - 24,
-        alpha: 0,
-        duration: 520,
-        onComplete: () => dmgText.destroy()
-      });
-    }
+    this.scene.tweens.add({
+      targets: dmgText,
+      y: dmgText.y - 24,
+      alpha: 0,
+      duration: 520,
+      onComplete: () => dmgText.destroy()
+    });
   }
 
   takeDamage(amount: number) {
