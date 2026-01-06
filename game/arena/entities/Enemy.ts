@@ -6,14 +6,24 @@ export default class Enemy {
 
   maxHp = 40;
   hp = 40;
-  defense = 2; // flat damage reduction
+  defense = 2;
   speed = 120;
+
+  killPoints = 100;
 
   hpBarBg: Phaser.GameObjects.Rectangle;
   hpBar: Phaser.GameObjects.Rectangle;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  onDeath?: (points: number) => void;
+
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    onDeath?: (points: number) => void
+  ) {
     this.scene = scene;
+    this.onDeath = onDeath;
 
     this.sprite = scene.physics.add
       .sprite(x, y, "enemy-basic")
@@ -21,7 +31,6 @@ export default class Enemy {
 
     this.sprite.setScale(0.35);
 
-    // HP bar
     this.hpBarBg = scene.add.rectangle(x, y - 18, 28, 4, 0x000000);
     this.hpBar = scene.add.rectangle(x, y - 18, 28, 4, 0xff3333);
 
@@ -56,7 +65,7 @@ export default class Enemy {
     const finalDamage = Math.max(1, rawDamage - this.defense);
     this.hp -= finalDamage;
 
-    // Floating damage text
+    // Floating damage number
     const dmgText = this.scene.add.text(
       this.sprite.x,
       this.sprite.y - 28,
@@ -80,7 +89,7 @@ export default class Enemy {
       onComplete: () => dmgText.destroy()
     });
 
-    // Knockback (attack only)
+    // Knockback
     const dx = this.sprite.x - fromX;
     const dy = this.sprite.y - fromY;
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -98,7 +107,6 @@ export default class Enemy {
       yoyo: true
     });
 
-    // HP bar update
     const hpRatio = Phaser.Math.Clamp(this.hp / this.maxHp, 0, 1);
     this.hpBar.width = 28 * hpRatio;
 
@@ -111,5 +119,9 @@ export default class Enemy {
     this.hpBar.destroy();
     this.hpBarBg.destroy();
     this.sprite.destroy();
+
+    if (this.onDeath) {
+      this.onDeath(this.killPoints);
+    }
   }
 }
