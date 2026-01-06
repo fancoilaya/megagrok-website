@@ -1,51 +1,101 @@
 import * as Phaser from "phaser";
 import Enemy from "../entities/Enemy";
 import HopGoblin from "../entities/HopGoblin";
+import HopSlime from "../entities/HopSlime";
+import Fudling from "../entities/Fudling";
 
 export default class EnemyManager {
   scene: Phaser.Scene;
   enemies: Enemy[] = [];
-
   onEnemyKilled?: (points: number) => void;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
+  // =========================
+  // SPAWN HELPERS
+  // =========================
+
   spawnHopGoblin(x: number, y: number) {
-    const enemy = new HopGoblin(
-      this.scene,
-      x,
-      y,
-      (points: number) => {
-        if (this.onEnemyKilled) {
-          this.onEnemyKilled(points);
-        }
-      }
-    );
-    this.enemies.push(enemy);
+    const e = new HopGoblin(this.scene, x, y, pts => {
+      if (this.onEnemyKilled) this.onEnemyKilled(pts);
+    });
+    this.enemies.push(e);
   }
 
-  update(player: Phaser.Physics.Arcade.Sprite) {
+  spawnHopSlime(x: number, y: number) {
+    const e = new HopSlime(this.scene, x, y, pts => {
+      if (this.onEnemyKilled) this.onEnemyKilled(pts);
+    });
+    this.enemies.push(e);
+  }
+
+  spawnFudling(x: number, y: number) {
+    const e = new Fudling(this.scene, x, y, pts => {
+      if (this.onEnemyKilled) this.onEnemyKilled(pts);
+    });
+    this.enemies.push(e);
+  }
+
+  // =========================
+  // UPDATE LOOP
+  // =========================
+
+  update(playerSprite: Phaser.Physics.Arcade.Sprite) {
     // Remove dead enemies
     this.enemies = this.enemies.filter(e => e.sprite.active);
 
-    // === SEPARATION (NO STACKING) ===
+    // Apply soft separation so enemies don’t stack
     this.applySeparation();
 
     // Update each enemy
     for (const enemy of this.enemies) {
-      enemy.update(player);
+      enemy.update(playerSprite);
     }
   }
 
+  // =========================
+  // TARGETING
+  // =========================
+
+  getClosestEnemy(
+    x: number,
+    y: number,
+    maxDistance: number
+  ): Enemy | null {
+    let closest: Enemy | null = null;
+    let closestDist = maxDistance;
+
+    for (const enemy of this.enemies) {
+      if (!enemy.sprite.active) continue;
+
+      const dx = enemy.sprite.x - x;
+      const dy = enemy.sprite.y - y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = enemy;
+      }
+    }
+
+    return closest;
+  }
+
+  // =========================
+  // SEPARATION (ANTI-STACK)
+  // =========================
+
   applySeparation() {
-    const minDist = 32;
+    const minDist = 26;
 
     for (let i = 0; i < this.enemies.length; i++) {
       for (let j = i + 1; j < this.enemies.length; j++) {
         const a = this.enemies[i].sprite;
         const b = this.enemies[j].sprite;
+
+        if (!a.active || !b.active) continue;
 
         const dx = a.x - b.x;
         const dy = a.y - b.y;
@@ -65,28 +115,14 @@ export default class EnemyManager {
     }
   }
 
-  getClosestEnemy(
-    x: number,
-    y: number,
-    range: number
-  ): Enemy | null {
-    let closest: Enemy | null = null;
-    let closestDist = range;
+  // =========================
+  // CLEANUP
+  // =========================
 
+  clearAll() {
     for (const enemy of this.enemies) {
-      const d = Phaser.Math.Distance.Between(
-        x,
-        y,
-        enemy.sprite.x,
-        enemy.sprite.y
-      );
-
-      if (d < closestDist) {
-        closestDist = d;
-        closest = enemy;
-      }
+      enemy.destroy();
     }
-
-    return closest;
+    this.enemies = [];
   }
 }
