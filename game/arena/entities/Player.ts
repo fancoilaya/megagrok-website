@@ -42,7 +42,6 @@ export default class Player {
     );
 
     this.cursors = scene.input.keyboard!.createCursorKeys();
-
     this.keys = scene.input.keyboard!.addKeys({
       W: Phaser.Input.Keyboard.KeyCodes.W,
       A: Phaser.Input.Keyboard.KeyCodes.A,
@@ -59,7 +58,6 @@ export default class Player {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
 
-    // Movement
     if (this.cursors.left?.isDown || this.keys.A.isDown)
       body.setVelocityX(-this.speed);
     else if (this.cursors.right?.isDown || this.keys.D.isDown)
@@ -72,24 +70,6 @@ export default class Player {
 
     body.velocity.normalize().scale(this.speed);
 
-    // Prevent walking through enemies
-    const manager = (this.scene as any).enemies;
-    if (manager) {
-      for (const enemy of manager.enemies) {
-        const d = Phaser.Math.Distance.Between(
-          this.sprite.x,
-          this.sprite.y,
-          enemy.sprite.x,
-          enemy.sprite.y
-        );
-        if (d < 26) {
-          body.setVelocity(0, 0);
-          break;
-        }
-      }
-    }
-
-    // Attack
     if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
       const now = this.scene.time.now;
       if (now - this.lastAttack > this.attackCooldown) {
@@ -98,11 +78,8 @@ export default class Player {
       }
     }
 
-    // Depth sorting
     this.sprite.setDepth(this.sprite.y);
     this.shadow.setDepth(this.sprite.y - 1);
-
-    // Sync shadow
     this.shadow.x = this.sprite.x;
     this.shadow.y = this.sprite.y + 18;
   }
@@ -118,37 +95,39 @@ export default class Player {
       dirY = Math.sign(body.velocity.y);
     }
 
-    const strikeX = this.sprite.x + dirX * 20;
-    const strikeY = this.sprite.y + dirY * 20;
+    const strikeX = this.sprite.x + dirX * 26;
+    const strikeY = this.sprite.y + dirY * 26;
 
-    // Visual hit
-    const hitFx = this.scene.add.circle(
-      strikeX,
-      strikeY,
-      22,
-      0xffffff,
-      0.3
-    );
-    hitFx.setDepth(1000);
-
-    this.scene.tweens.add({
-      targets: hitFx,
-      alpha: 0,
-      scale: 1.4,
-      duration: 120,
-      onComplete: () => hitFx.destroy()
-    });
-
-    // Lunge
+    // === STRIKE SQUASH (NO JUMP) ===
     this.scene.tweens.add({
       targets: this.sprite,
-      x: this.sprite.x + dirX * 10,
-      y: this.sprite.y + dirY * 10,
-      duration: 80,
+      scaleX: 0.45,
+      scaleY: 0.38,
+      duration: 60,
       yoyo: true
     });
 
-    // Damage one enemy
+    // === SLASH EFFECT ===
+    const slash = this.scene.add.rectangle(
+      strikeX,
+      strikeY,
+      30,
+      12,
+      0xffffff,
+      0.25
+    );
+    slash.setRotation(Math.atan2(dirY, dirX));
+    slash.setDepth(1000);
+
+    this.scene.tweens.add({
+      targets: slash,
+      alpha: 0,
+      scaleX: 1.6,
+      duration: 120,
+      onComplete: () => slash.destroy()
+    });
+
+    // === DAMAGE ONE ENEMY ===
     const manager = (this.scene as any).enemies;
     if (!manager) return;
 
@@ -159,7 +138,7 @@ export default class Player {
     );
 
     if (enemy) {
-      enemy.takeDamage(this.attackDamage);
+      enemy.takeDamage(this.attackDamage, this.sprite.x, this.sprite.y);
     }
   }
 }
