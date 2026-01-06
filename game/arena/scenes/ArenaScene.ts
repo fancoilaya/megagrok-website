@@ -38,16 +38,7 @@ export default class ArenaScene extends Phaser.Scene {
       );
     }
 
-    // === COLLISION: ENEMY ↔ ENEMY ===
-    for (let i = 0; i < this.enemies.enemies.length; i++) {
-      for (let j = i + 1; j < this.enemies.enemies.length; j++) {
-        this.physics.add.collider(
-          this.enemies.enemies[i].sprite,
-          this.enemies.enemies[j].sprite
-        );
-      }
-    }
-
+   
     // Camera
     this.cameras.main.startFollow(this.player.sprite, true, 0.08, 0.08);
   }
