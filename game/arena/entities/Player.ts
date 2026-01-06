@@ -4,7 +4,7 @@ import EnemyManager from "../systems/EnemyManager";
 export default class Player {
   scene: Phaser.Scene;
   sprite: Phaser.Physics.Arcade.Sprite;
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  cursors: Phaser.TypesInput.Keyboard.CursorKeys;
   keys: any;
 
   speed = 260;
@@ -13,7 +13,7 @@ export default class Player {
 
   attackCooldown = 460;
   lastAttack = 0;
-  attackRange = 90; // slightly extended
+  attackRange = 105; // ⬅️ increased again (feels fair)
 
   enemyManager: EnemyManager;
 
@@ -75,9 +75,7 @@ export default class Player {
       this.attackRange
     );
 
-    // Default forward direction
     let angle = this.sprite.flipX ? Math.PI : 0;
-
     if (target) {
       angle = Phaser.Math.Angle.Between(
         this.sprite.x,
@@ -87,53 +85,54 @@ export default class Player {
       );
     }
 
-    // === WIND-UP ===
+    // === OFFSET ORIGIN FOR VISUAL (IMPORTANT) ===
+    const offsetDistance = 55;
+    const originX = this.sprite.x + Math.cos(angle) * offsetDistance;
+    const originY = this.sprite.y + Math.sin(angle) * offsetDistance;
+
+    // === WIND-UP (SHORT) ===
     this.scene.tweens.add({
       targets: this.sprite,
-      angle: Phaser.Math.RadToDeg(angle) * 0.03,
+      angle: Phaser.Math.RadToDeg(angle) * 0.04,
       duration: 80,
       yoyo: true
     });
 
-    // === FORCE ARC (LAYERED, BRIGHT) ===
-    const arc = this.scene.add.graphics();
-    arc.setDepth(this.sprite.y + 5);
+    // === SLASH BAND VISUAL ===
+    const gfx = this.scene.add.graphics();
+    gfx.setDepth(this.sprite.y + 6);
 
-    // Glow layer
-    arc.fillStyle(0xff8888, 0.35);
-    arc.beginPath();
-    arc.moveTo(this.sprite.x, this.sprite.y);
-    arc.arc(
-      this.sprite.x,
-      this.sprite.y,
-      86,
-      angle - Phaser.Math.DegToRad(40),
-      angle + Phaser.Math.DegToRad(40)
+    // Outer glow band
+    gfx.lineStyle(18, 0xff8888, 0.35);
+    gfx.beginPath();
+    gfx.arc(
+      originX,
+      originY,
+      48,
+      angle - Phaser.Math.DegToRad(30),
+      angle + Phaser.Math.DegToRad(30)
     );
-    arc.closePath();
-    arc.fillPath();
+    gfx.strokePath();
 
-    // Core strike layer
-    arc.fillStyle(0xff3333, 0.85);
-    arc.beginPath();
-    arc.moveTo(this.sprite.x, this.sprite.y);
-    arc.arc(
-      this.sprite.x,
-      this.sprite.y,
-      72,
-      angle - Phaser.Math.DegToRad(28),
-      angle + Phaser.Math.DegToRad(28)
+    // Core slash band
+    gfx.lineStyle(10, 0xff2222, 0.95);
+    gfx.beginPath();
+    gfx.arc(
+      originX,
+      originY,
+      44,
+      angle - Phaser.Math.DegToRad(22),
+      angle + Phaser.Math.DegToRad(22)
     );
-    arc.closePath();
-    arc.fillPath();
+    gfx.strokePath();
 
-    // Animate arc
+    // Animate slash
     this.scene.tweens.add({
-      targets: arc,
-      scale: 1.12,
+      targets: gfx,
       alpha: 0,
-      duration: 140,
-      onComplete: () => arc.destroy()
+      scale: 1.15,
+      duration: 160,
+      onComplete: () => gfx.destroy()
     });
 
     // === HIT STOP ===
@@ -144,13 +143,12 @@ export default class Player {
 
     // === DAMAGE ===
     if (target) {
-      const dmg = Phaser.Math.Between(10, 16);
+      const dmg = Phaser.Math.Between(11, 17);
       target.takeDamage(dmg, this.sprite.x, this.sprite.y);
 
-      // Damage number
       const dmgText = this.scene.add.text(
         target.sprite.x,
-        target.sprite.y - 20,
+        target.sprite.y - 22,
         `-${dmg}`,
         {
           fontSize: "15px",
@@ -165,7 +163,7 @@ export default class Player {
 
       this.scene.tweens.add({
         targets: dmgText,
-        y: dmgText.y - 22,
+        y: dmgText.y - 24,
         alpha: 0,
         duration: 520,
         onComplete: () => dmgText.destroy()
