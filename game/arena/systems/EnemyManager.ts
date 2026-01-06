@@ -43,13 +43,12 @@ export default class EnemyManager {
   // =========================
 
   update(playerSprite: Phaser.Physics.Arcade.Sprite) {
-    // Remove dead enemies
+    // Remove dead enemies from list
     this.enemies = this.enemies.filter(e => e.sprite.active);
 
-    // Apply soft separation so enemies don’t stack
+    // Prevent stacking
     this.applySeparation();
 
-    // Update each enemy
     for (const enemy of this.enemies) {
       enemy.update(playerSprite);
     }
@@ -116,12 +115,14 @@ export default class EnemyManager {
   }
 
   // =========================
-  // CLEANUP
+  // CLEANUP (BETWEEN WAVES / RESET)
   // =========================
 
   clearAll() {
     for (const enemy of this.enemies) {
-      enemy.destroy();
+      enemy.sprite.destroy();
+      enemy.hpBar.destroy();
+      enemy.hpBarBg.destroy();
     }
     this.enemies = [];
   }
