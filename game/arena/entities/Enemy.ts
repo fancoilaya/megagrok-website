@@ -15,31 +15,41 @@ export default class Enemy {
       .sprite(x, y, "enemy-basic")
       .setCollideWorldBounds(true);
 
-    this.sprite.setScale(0.4);
-    this.sprite.setDepth(9);
+    this.sprite.setScale(0.35);
+    this.sprite.setDepth(this.sprite.y);
   }
 
   update(player: Phaser.Physics.Arcade.Sprite) {
     const dx = player.x - this.sprite.x;
     const dy = player.y - this.sprite.y;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
+    const stopDistance = 28;
+
+    if (dist > stopDistance) {
+      const nx = dx / dist;
+      const ny = dy / dist;
+
+      this.sprite.setVelocity(
+        nx * this.speed,
+        ny * this.speed
+      );
+    } else {
+      this.sprite.setVelocity(0, 0);
+    }
+
+    // Y-depth sorting
     this.sprite.setDepth(this.sprite.y);
-
-    this.sprite.setVelocity(
-      (dx / len) * this.speed,
-      (dy / len) * this.speed
-    );
   }
 
   takeDamage(amount: number) {
     this.hp -= amount;
 
-    // Hit flash
+    // Hit feedback
     this.scene.tweens.add({
       targets: this.sprite,
-      alpha: 0.5,
-      duration: 50,
+      alpha: 0.6,
+      duration: 60,
       yoyo: true
     });
 
