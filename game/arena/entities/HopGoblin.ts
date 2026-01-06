@@ -21,12 +21,12 @@ export default class HopGoblin extends Enemy {
     this.contactDamage = 5;
     this.killPoints = 120;
 
-    // === USE REAL ART ===
+    // === REAL ART ===
     this.sprite.setTexture("hopgoblin");
     this.sprite.setScale(0.22);
     this.sprite.setOrigin(0.5, 0.65); // feet weighted
 
-    // Idle wiggle (life!)
+    // Idle wiggle (life)
     scene.tweens.add({
       targets: this.sprite,
       angle: { from: -2, to: 2 },
@@ -46,19 +46,19 @@ export default class HopGoblin extends Enemy {
     const stopDistance = 26;
 
     if (dist > stopDistance) {
+      // === HOP TOWARDS PLAYER ===
       if (now - this.lastHop > this.hopCooldown) {
         this.lastHop = now;
 
         const nx = dx / dist;
         const ny = dy / dist;
 
-        // === HOP IMPULSE ===
         this.sprite.setVelocity(
           nx * this.speed * 1.4,
           ny * this.speed * 1.4
         );
 
-        // === HOP ANIMATION ===
+        // Hop squash & stretch
         this.scene.tweens.add({
           targets: this.sprite,
           scaleX: 0.26,
@@ -68,18 +68,47 @@ export default class HopGoblin extends Enemy {
         });
       }
     } else {
+      // === ATTACK PLAYER (VISIBLE) ===
       this.sprite.setVelocity(0, 0);
 
-      // Contact damage
-      (player as any).getData?.("ref")?.takeDamage(this.contactDamage);
+      if (!this.sprite.getData("attacking")) {
+        this.sprite.setData("attacking", true);
+
+        // Wind-up
+        this.scene.tweens.add({
+          targets: this.sprite,
+          scaleX: 0.24,
+          scaleY: 0.30,
+          duration: 120,
+          yoyo: true,
+          onComplete: () => {
+            // Deal damage
+            (player as any).getData?.("ref")?.takeDamage(this.contactDamage);
+
+            // Strike snap
+            this.scene.tweens.add({
+              targets: this.sprite,
+              angle: Phaser.Math.Between(-10, 10),
+              duration: 60,
+              yoyo: true
+            });
+
+            // Cooldown before next attack
+            this.scene.time.delayedCall(600, () => {
+              this.sprite.setData("attacking", false);
+            });
+          }
+        });
+      }
     }
 
     // === HP BAR & DEPTH ===
     this.hpBarBg.setPosition(this.sprite.x, this.sprite.y - 22);
     this.hpBar.setPosition(this.sprite.x, this.sprite.y - 22);
 
-    this.sprite.setDepth(this.sprite.y);
-    this.hpBarBg.setDepth(this.sprite.y + 1);
-    this.hpBar.setDepth(this.sprite.y + 2);
+    // Enemy slightly below player for readability
+    this.sprite.setDepth(this.sprite.y - 1);
+    this.hpBarBg.setDepth(this.sprite.y);
+    this.hpBar.setDepth(this.sprite.y + 1);
   }
 }
