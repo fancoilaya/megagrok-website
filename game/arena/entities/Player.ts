@@ -15,7 +15,7 @@ export default class Player {
 
   attackKey: Phaser.Input.Keyboard.Key;
 
-  speed = 360;
+  speed = 320;
   attackRange = 55;
   attackCooldown = 350;
   lastAttack = 0;
@@ -26,15 +26,19 @@ export default class Player {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
+    // === PLAYER SPRITE ===
     this.sprite = scene.physics.add
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    this.sprite.body.setImmovable(true);
+    // IMPORTANT: prevent player from being pushed by enemies
+    (this.sprite.body as Phaser.Physics.Arcade.Body).setImmovable(true);
 
-    this.sprite.setScale(0.35);
+    // Scale & depth
+    this.sprite.setScale(0.42);
     this.sprite.setDepth(10);
 
+    // === GROUND SHADOW ===
     this.shadow = scene.add.ellipse(
       x,
       y + 18,
@@ -45,6 +49,7 @@ export default class Player {
     );
     this.shadow.setDepth(5);
 
+    // === INPUT ===
     this.cursors = scene.input.keyboard!.createCursorKeys();
 
     this.keys = scene.input.keyboard!.addKeys({
@@ -85,11 +90,13 @@ export default class Player {
       }
     }
 
-    this.shadow.x = this.sprite.x;
-    this.shadow.y = this.sprite.y + 18;
-
+    // === DEPTH SORTING ===
     this.sprite.setDepth(this.sprite.y);
     this.shadow.setDepth(this.sprite.y - 1);
+
+    // === SYNC SHADOW ===
+    this.shadow.x = this.sprite.x;
+    this.shadow.y = this.sprite.y + 18;
   }
 
   performAttack() {
@@ -115,7 +122,7 @@ export default class Player {
       0xffffff,
       0.3
     );
-    hitFx.setDepth(20);
+    hitFx.setDepth(1000);
 
     this.scene.tweens.add({
       targets: hitFx,
