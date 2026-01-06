@@ -11,9 +11,9 @@ export default class Player {
   hp = 100;
   maxHp = 100;
 
-  attackCooldown = 450;
+  attackCooldown = 460;
   lastAttack = 0;
-  attackRange = 78;
+  attackRange = 90; // slightly extended
 
   enemyManager: EnemyManager;
 
@@ -31,7 +31,6 @@ export default class Player {
       .setCollideWorldBounds(true);
 
     this.sprite.setScale(0.38);
-    this.sprite.setDepth(this.sprite.y);
     this.sprite.setData("ref", this);
 
     const keyboard =
@@ -53,7 +52,6 @@ export default class Player {
 
     body.setVelocity(vx * this.speed, vy * this.speed);
 
-    // Facing
     if (vx !== 0) {
       this.sprite.setFlipX(vx < 0);
     }
@@ -70,79 +68,104 @@ export default class Player {
     if (now - this.lastAttack < this.attackCooldown) return;
     this.lastAttack = now;
 
-    const dirX = this.sprite.flipX ? -1 : 1;
-    const dirAngle = dirX < 0 ? Math.PI : 0;
+    // === FIND TARGET FIRST ===
+    const target = this.enemyManager.getClosestEnemy(
+      this.sprite.x,
+      this.sprite.y,
+      this.attackRange
+    );
 
-    // === WIND-UP (VERY SHORT) ===
+    // Default forward direction
+    let angle = this.sprite.flipX ? Math.PI : 0;
+
+    if (target) {
+      angle = Phaser.Math.Angle.Between(
+        this.sprite.x,
+        this.sprite.y,
+        target.sprite.x,
+        target.sprite.y
+      );
+    }
+
+    // === WIND-UP ===
     this.scene.tweens.add({
       targets: this.sprite,
-      angle: dirX * -6,
+      angle: Phaser.Math.RadToDeg(angle) * 0.03,
       duration: 80,
       yoyo: true
     });
 
-    // === FORCE ARC VISUAL ===
+    // === FORCE ARC (LAYERED, BRIGHT) ===
     const arc = this.scene.add.graphics();
-    arc.setDepth(this.sprite.y + 2);
+    arc.setDepth(this.sprite.y + 5);
 
-    arc.fillStyle(0xff5555, 0.55);
+    // Glow layer
+    arc.fillStyle(0xff8888, 0.35);
+    arc.beginPath();
+    arc.moveTo(this.sprite.x, this.sprite.y);
+    arc.arc(
+      this.sprite.x,
+      this.sprite.y,
+      86,
+      angle - Phaser.Math.DegToRad(40),
+      angle + Phaser.Math.DegToRad(40)
+    );
+    arc.closePath();
+    arc.fillPath();
+
+    // Core strike layer
+    arc.fillStyle(0xff3333, 0.85);
     arc.beginPath();
     arc.moveTo(this.sprite.x, this.sprite.y);
     arc.arc(
       this.sprite.x,
       this.sprite.y,
       72,
-      dirAngle - Phaser.Math.DegToRad(35),
-      dirAngle + Phaser.Math.DegToRad(35)
+      angle - Phaser.Math.DegToRad(28),
+      angle + Phaser.Math.DegToRad(28)
     );
     arc.closePath();
     arc.fillPath();
 
-    // Fade & expand slightly
+    // Animate arc
     this.scene.tweens.add({
       targets: arc,
+      scale: 1.12,
       alpha: 0,
-      scale: 1.15,
-      duration: 120,
+      duration: 140,
       onComplete: () => arc.destroy()
     });
 
-    // === HIT STOP (IMPACT) ===
-    this.scene.time.timeScale = 0.92;
-    this.scene.time.delayedCall(40, () => {
+    // === HIT STOP ===
+    this.scene.time.timeScale = 0.9;
+    this.scene.time.delayedCall(45, () => {
       this.scene.time.timeScale = 1;
     });
 
     // === DAMAGE ===
-    const enemy = this.enemyManager.getClosestEnemy(
-      this.sprite.x + dirX * 40,
-      this.sprite.y,
-      this.attackRange
-    );
-
-    if (enemy) {
-      const dmg = Phaser.Math.Between(9, 15);
-      enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
+    if (target) {
+      const dmg = Phaser.Math.Between(10, 16);
+      target.takeDamage(dmg, this.sprite.x, this.sprite.y);
 
       // Damage number
       const dmgText = this.scene.add.text(
-        enemy.sprite.x,
-        enemy.sprite.y - 18,
+        target.sprite.x,
+        target.sprite.y - 20,
         `-${dmg}`,
         {
-          fontSize: "14px",
+          fontSize: "15px",
           fontFamily: "monospace",
-          color: "#ff6666",
+          color: "#ff2222",
           stroke: "#000000",
           strokeThickness: 2
         }
       );
 
-      dmgText.setDepth(enemy.sprite.y + 10);
+      dmgText.setDepth(target.sprite.y + 10);
 
       this.scene.tweens.add({
         targets: dmgText,
-        y: dmgText.y - 20,
+        y: dmgText.y - 22,
         alpha: 0,
         duration: 520,
         onComplete: () => dmgText.destroy()
