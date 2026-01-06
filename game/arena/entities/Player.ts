@@ -1,197 +1,158 @@
 import * as Phaser from "phaser";
-import Enemy from "./Enemy";
+import EnemyManager from "../systems/EnemyManager";
 
 export default class Player {
   scene: Phaser.Scene;
   sprite: Phaser.Physics.Arcade.Sprite;
-
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-  keys: {
-    W: Phaser.Input.Keyboard.Key;
-    A: Phaser.Input.Keyboard.Key;
-    S: Phaser.Input.Keyboard.Key;
-    D: Phaser.Input.Keyboard.Key;
-  };
+  keys: any;
 
-  attackKey: Phaser.Input.Keyboard.Key;
-
-  // === MOVEMENT ===
-  speed = 320;
-
-  // === ATTACK ===
-  attackRange = 55;
-  attackCooldown = 350;
-  lastAttack = 0;
-  attackMin = 10;
-  attackMax = 18;
-
-  // === HP / DAMAGE ===
-  maxHp = 100;
+  speed = 260;
   hp = 100;
-  damageCooldown = 800;
-  lastDamageTime = 0;
+  maxHp = 100;
 
-  shadow: Phaser.GameObjects.Ellipse;
+  attackCooldown = 420;
+  lastAttack = 0;
+  attackRange = 58;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  enemyManager: EnemyManager;
+
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    enemyManager: EnemyManager
+  ) {
     this.scene = scene;
+    this.enemyManager = enemyManager;
 
-    // === SPRITE ===
     this.sprite = scene.physics.add
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    this.sprite.setScale(0.42);
+    (this.sprite.body as Phaser.Physics.Arcade.Body).setImmovable(true);
 
-    // === SHADOW ===
-    this.shadow = scene.add.ellipse(
-      x,
-      y + 18,
-      60,
-      22,
-      0x000000,
-      0.35
-    );
+    this.sprite.setScale(0.38);
+    this.sprite.setDepth(this.sprite.y);
+    this.sprite.setData("ref", this);
 
-    // === INPUT ===
-    this.cursors = scene.input.keyboard!.createCursorKeys();
-    this.keys = scene.input.keyboard!.addKeys({
-      W: Phaser.Input.Keyboard.KeyCodes.W,
-      A: Phaser.Input.Keyboard.KeyCodes.A,
-      S: Phaser.Input.Keyboard.KeyCodes.S,
-      D: Phaser.Input.Keyboard.KeyCodes.D
-    }) as any;
-
-    this.attackKey = scene.input.keyboard!.addKey(
-      Phaser.Input.Keyboard.KeyCodes.SPACE
-    );
+    this.cursors = scene.input.keyboard.createCursorKeys();
+    this.keys = scene.input.keyboard.addKeys("W,A,S,D,SPACE");
   }
 
-  update(_: number) {
+  update(delta: number) {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0);
 
-    // === MOVEMENT ===
-    if (this.cursors.left?.isDown || this.keys.A.isDown)
-      body.setVelocityX(-this.speed);
-    else if (this.cursors.right?.isDown || this.keys.D.isDown)
-      body.setVelocityX(this.speed);
+    let vx = 0;
+    let vy = 0;
 
-    if (this.cursors.up?.isDown || this.keys.W.isDown)
-      body.setVelocityY(-this.speed);
-    else if (this.cursors.down?.isDown || this.keys.S.isDown)
-      body.setVelocityY(this.speed);
+    if (this.cursors.left.isDown || this.keys.A.isDown) vx = -1;
+    if (this.cursors.right.isDown || this.keys.D.isDown) vx = 1;
+    if (this.cursors.up.isDown || this.keys.W.isDown) vy = -1;
+    if (this.cursors.down.isDown || this.keys.S.isDown) vy = 1;
 
-    body.velocity.normalize().scale(this.speed);
+    body.setVelocity(vx * this.speed, vy * this.speed);
 
-    // === ATTACK ===
-    if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
-      const now = this.scene.time.now;
-      if (now - this.lastAttack > this.attackCooldown) {
-        this.lastAttack = now;
-        this.performAttack();
-      }
+    // === FACING (LEFT / RIGHT) ===
+    if (vx !== 0) {
+      this.sprite.setFlipX(vx < 0);
     }
 
-    // === DEPTH + SHADOW ===
+    // Depth follows Y
     this.sprite.setDepth(this.sprite.y);
-    this.shadow.setDepth(this.sprite.y - 1);
-    this.shadow.x = this.sprite.x;
-    this.shadow.y = this.sprite.y + 18;
+
+    // === ATTACK ===
+    if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
+      this.performAttack();
+    }
   }
 
   performAttack() {
-    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+    const now = this.scene.time.now;
+    if (now - this.lastAttack < this.attackCooldown) return;
+    this.lastAttack = now;
 
-    // === ATTACK DIRECTION ===
-    let dirX = 0;
-    let dirY = 1;
+    // Determine attack direction
+    let dirX = this.sprite.flipX ? -1 : 1;
+    let dirY = 0;
 
-    if (body.velocity.length() > 0) {
-      dirX = Math.sign(body.velocity.x);
-      dirY = Math.sign(body.velocity.y);
-    }
+    const attackX = this.sprite.x + dirX * 28;
+    const attackY = this.sprite.y;
 
-    const strikeX = this.sprite.x + dirX * 28;
-    const strikeY = this.sprite.y + dirY * 28;
+    // === ENERGY WAVE VISUAL ===
+    const wave = this.scene.add.ellipse(
+      attackX,
+      attackY,
+      34,
+      18,
+      0xff3b3b,
+      0.45
+    );
 
-    // === BODY LEAN (SELL PUNCH) ===
+    wave.setDepth(this.sprite.y + 1);
+    wave.rotation = dirX < 0 ? Math.PI : 0;
+
+    this.scene.tweens.add({
+      targets: wave,
+      scaleX: 1.6,
+      scaleY: 1.2,
+      alpha: 0,
+      duration: 120,
+      onComplete: () => wave.destroy()
+    });
+
+    // === PUNCH FEEL (SPRITE SNAP) ===
     this.scene.tweens.add({
       targets: this.sprite,
-      angle: dirX !== 0 ? dirX * 8 : 0,
-      duration: 40,
+      x: this.sprite.x + dirX * 6,
+      duration: 60,
       yoyo: true
     });
 
-    // === FIST / HIT FLASH ===
-    const punch = this.scene.add.circle(
-      strikeX,
-      strikeY,
-      6,
-      0xffffff,
-      0.9
-    );
-    punch.setDepth(2000);
-
-    this.scene.tweens.add({
-      targets: punch,
-      scale: 2,
-      alpha: 0,
-      duration: 120,
-      onComplete: () => punch.destroy()
-    });
-
-    // === HIT STOP (IMPACT) ===
-    this.scene.time.timeScale = 0.9;
-    this.scene.time.delayedCall(60, () => {
-      this.scene.time.timeScale = 1;
-    });
-
-    // === DAMAGE LOGIC ===
-    const manager = (this.scene as any).enemies;
-    if (!manager) return;
-
-    const enemy: Enemy | null = manager.getClosestEnemy(
-      strikeX,
-      strikeY,
+    // === HIT DETECTION ===
+    const enemy = this.enemyManager.getClosestEnemy(
+      this.sprite.x,
+      this.sprite.y,
       this.attackRange
     );
 
     if (enemy) {
-      const rawDamage = Phaser.Math.Between(
-        this.attackMin,
-        this.attackMax
+      const dmg = Phaser.Math.Between(8, 14);
+      enemy.takeDamage(dmg);
+
+      // Damage number
+      const dmgText = this.scene.add.text(
+        enemy.sprite.x,
+        enemy.sprite.y - 20,
+        `-${dmg}`,
+        {
+          fontSize: "14px",
+          color: "#ff4b4b",
+          fontFamily: "monospace"
+        }
       );
-      enemy.takeDamage(rawDamage, this.sprite.x, this.sprite.y);
+
+      dmgText.setDepth(enemy.sprite.y + 10);
+
+      this.scene.tweens.add({
+        targets: dmgText,
+        y: dmgText.y - 18,
+        alpha: 0,
+        duration: 500,
+        onComplete: () => dmgText.destroy()
+      });
     }
   }
 
   takeDamage(amount: number) {
-    const now = this.scene.time.now;
-    if (now - this.lastDamageTime < this.damageCooldown) return;
+    this.hp = Math.max(0, this.hp - amount);
 
-    this.lastDamageTime = now;
-    this.hp -= amount;
-
-    // Player hit feedback
+    // Hit flash
     this.scene.tweens.add({
       targets: this.sprite,
-      alpha: 0.5,
-      duration: 80,
+      alpha: 0.7,
+      duration: 40,
       yoyo: true
-    });
-
-    if (this.hp <= 0) {
-      this.die();
-    }
-  }
-
-  die() {
-    this.sprite.setTint(0xff0000);
-    this.sprite.setVelocity(0, 0);
-
-    this.scene.time.delayedCall(500, () => {
-      this.scene.scene.restart();
     });
   }
 }
