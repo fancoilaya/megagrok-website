@@ -20,9 +20,13 @@ export default class Player {
   attackCooldown = 350;
   lastAttack = 0;
 
-  // === PLAYER COMBAT STATS ===
   attackMin = 10;
   attackMax = 18;
+
+  maxHp = 100;
+  hp = 100;
+  damageCooldown = 800;
+  lastDamageTime = 0;
 
   shadow: Phaser.GameObjects.Ellipse;
 
@@ -73,6 +77,7 @@ export default class Player {
 
     body.velocity.normalize().scale(this.speed);
 
+    // Attack
     if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
       const now = this.scene.time.now;
       if (now - this.lastAttack > this.attackCooldown) {
@@ -101,7 +106,7 @@ export default class Player {
     const strikeX = this.sprite.x + dirX * 26;
     const strikeY = this.sprite.y + dirY * 26;
 
-    // Punch animation (no jump)
+    // Punch animation
     this.scene.tweens.add({
       targets: this.sprite,
       scaleX: 0.48,
@@ -146,5 +151,34 @@ export default class Player {
       );
       enemy.takeDamage(rawDamage, this.sprite.x, this.sprite.y);
     }
+  }
+
+  takeDamage(amount: number) {
+    const now = this.scene.time.now;
+    if (now - this.lastDamageTime < this.damageCooldown) return;
+
+    this.lastDamageTime = now;
+    this.hp -= amount;
+
+    // Player hit feedback
+    this.scene.tweens.add({
+      targets: this.sprite,
+      alpha: 0.5,
+      duration: 80,
+      yoyo: true
+    });
+
+    if (this.hp <= 0) {
+      this.die();
+    }
+  }
+
+  die() {
+    this.sprite.setTint(0xff0000);
+    this.sprite.setVelocity(0, 0);
+
+    this.scene.time.delayedCall(500, () => {
+      this.scene.scene.restart();
+    });
   }
 }
