@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+import Enemy from "./Enemy";
 
 export default class Player {
   scene: Phaser.Scene;
@@ -14,25 +15,24 @@ export default class Player {
 
   attackKey: Phaser.Input.Keyboard.Key;
 
-  speed = 360;
+  speed = 320;
+  attackRange = 55;
   attackCooldown = 350;
   lastAttack = 0;
+  attackDamage = 15;
 
   shadow: Phaser.GameObjects.Ellipse;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
-    // === PLAYER SPRITE ===
     this.sprite = scene.physics.add
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
-    // Scale & layering
-    this.sprite.setScale(0.30);
+    this.sprite.setScale(0.42);
     this.sprite.setDepth(10);
 
-    // === GROUND SHADOW ===
     this.shadow = scene.add.ellipse(
       x,
       y + 18,
@@ -43,7 +43,6 @@ export default class Player {
     );
     this.shadow.setDepth(5);
 
-    // === INPUT ===
     this.cursors = scene.input.keyboard!.createCursorKeys();
 
     this.keys = scene.input.keyboard!.addKeys({
@@ -63,17 +62,15 @@ export default class Player {
     body.setVelocity(0);
 
     // === MOVEMENT ===
-    if (this.cursors.left?.isDown || this.keys.A.isDown) {
+    if (this.cursors.left?.isDown || this.keys.A.isDown)
       body.setVelocityX(-this.speed);
-    } else if (this.cursors.right?.isDown || this.keys.D.isDown) {
+    else if (this.cursors.right?.isDown || this.keys.D.isDown)
       body.setVelocityX(this.speed);
-    }
 
-    if (this.cursors.up?.isDown || this.keys.W.isDown) {
+    if (this.cursors.up?.isDown || this.keys.W.isDown)
       body.setVelocityY(-this.speed);
-    } else if (this.cursors.down?.isDown || this.keys.S.isDown) {
+    else if (this.cursors.down?.isDown || this.keys.S.isDown)
       body.setVelocityY(this.speed);
-    }
 
     body.velocity.normalize().scale(this.speed);
 
@@ -86,7 +83,6 @@ export default class Player {
       }
     }
 
-    // === SYNC SHADOW ===
     this.shadow.x = this.sprite.x;
     this.shadow.y = this.sprite.y + 18;
   }
@@ -94,58 +90,57 @@ export default class Player {
   performAttack() {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
-    // === DETERMINE STRIKE DIRECTION ===
+    // === STRIKE DIRECTION ===
     let dirX = 0;
-    let dirY = 0;
+    let dirY = 1;
 
-    if (body.velocity.x !== 0 || body.velocity.y !== 0) {
+    if (body.velocity.length() > 0) {
       dirX = Math.sign(body.velocity.x);
       dirY = Math.sign(body.velocity.y);
-    } else {
-      dirY = 1; // default forward strike
     }
 
-    // === STRIKE LUNGE ===
-    this.scene.tweens.add({
-      targets: this.sprite,
-      x: this.sprite.x + dirX * 12,
-      y: this.sprite.y + dirY * 12,
-      duration: 80,
-      ease: "Power2",
-      yoyo: true
-    });
+    const strikeX = this.sprite.x + dirX * 20;
+    const strikeY = this.sprite.y + dirY * 20;
 
-    // === SCALE PUNCH ===
-    this.scene.tweens.add({
-      targets: this.sprite,
-      scale: 0.46,
-      duration: 60,
-      yoyo: true
-    });
-
-    // === HIT FLASH ===
-    this.scene.tweens.add({
-      targets: this.sprite,
-      alpha: 0.7,
-      duration: 40,
-      yoyo: true
-    });
-
-    // === SHADOW REACTION ===
-    this.scene.tweens.add({
-      targets: this.shadow,
-      scaleX: 0.8,
-      scaleY: 0.8,
-      duration: 60,
-      yoyo: true
-    });
-
-    // === APPLY DAMAGE ===
-    (this.scene as any).enemies?.damageAt(
-      this.sprite.x + dirX * 20,
-      this.sprite.y + dirY * 20,
-      40,
-      15
+    // === VISUAL STRIKE FX ===
+    const hitFx = this.scene.add.circle(
+      strikeX,
+      strikeY,
+      22,
+      0xffffff,
+      0.3
     );
+    hitFx.setDepth(20);
+
+    this.scene.tweens.add({
+      targets: hitFx,
+      alpha: 0,
+      scale: 1.4,
+      duration: 120,
+      onComplete: () => hitFx.destroy()
+    });
+
+    // === PLAYER LUNGE ===
+    this.scene.tweens.add({
+      targets: this.sprite,
+      x: this.sprite.x + dirX * 10,
+      y: this.sprite.y + dirY * 10,
+      duration: 80,
+      yoyo: true
+    });
+
+    // === FIND & DAMAGE ONE ENEMY ===
+    const manager = (this.scene as any).enemies;
+    if (!manager) return;
+
+    const enemy: Enemy | null = manager.getClosestEnemy(
+      strikeX,
+      strikeY,
+      this.attackRange
+    );
+
+    if (enemy) {
+      enemy.takeDamage(this.attackDamage);
+    }
   }
 }
