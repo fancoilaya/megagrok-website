@@ -19,7 +19,10 @@ export default class Player {
   attackRange = 55;
   attackCooldown = 350;
   lastAttack = 0;
-  attackDamage = 14;
+
+  // === PLAYER COMBAT STATS ===
+  attackMin = 10;
+  attackMax = 18;
 
   shadow: Phaser.GameObjects.Ellipse;
 
@@ -98,7 +101,7 @@ export default class Player {
     const strikeX = this.sprite.x + dirX * 26;
     const strikeY = this.sprite.y + dirY * 26;
 
-    // === PUNCH ANIMATION (NO JUMP) ===
+    // Punch animation (no jump)
     this.scene.tweens.add({
       targets: this.sprite,
       scaleX: 0.48,
@@ -107,7 +110,7 @@ export default class Player {
       yoyo: true
     });
 
-    // === SLASH VISUAL ===
+    // Slash visual
     const slash = this.scene.add.rectangle(
       strikeX,
       strikeY,
@@ -127,7 +130,6 @@ export default class Player {
       onComplete: () => slash.destroy()
     });
 
-    // === DAMAGE ONE ENEMY ===
     const manager = (this.scene as any).enemies;
     if (!manager) return;
 
@@ -138,7 +140,11 @@ export default class Player {
     );
 
     if (enemy) {
-      enemy.takeDamage(this.attackDamage, this.sprite.x, this.sprite.y);
+      const rawDamage = Phaser.Math.Between(
+        this.attackMin,
+        this.attackMax
+      );
+      enemy.takeDamage(rawDamage, this.sprite.x, this.sprite.y);
     }
   }
 }
