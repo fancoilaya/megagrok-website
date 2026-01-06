@@ -7,13 +7,13 @@ export default class Player {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   keys: any;
 
-  speed = 260;
+  speed = 210; // ⬅️ slowed down
   hp = 100;
   maxHp = 100;
 
   attackCooldown = 420;
   lastAttack = 0;
-  attackRange = 120; // generous but fair
+  attackRange = 120;
 
   enemyManager: EnemyManager;
 
@@ -69,7 +69,6 @@ export default class Player {
     if (now - this.lastAttack < this.attackCooldown) return;
     this.lastAttack = now;
 
-    // === LOCK ON CLOSEST ENEMY ===
     const enemy = this.enemyManager.getClosestEnemy(
       this.sprite.x,
       this.sprite.y,
@@ -81,21 +80,18 @@ export default class Player {
     const ex = enemy.sprite.x;
     const ey = enemy.sprite.y;
 
-    // === FACE TARGET ===
     this.sprite.setFlipX(ex < this.sprite.x);
 
-    // === FORCE STRIKE VISUAL (LINE) ===
+    // Force strike visual (unchanged)
     const gfx = this.scene.add.graphics();
     gfx.setDepth(Math.max(this.sprite.y, ey) + 5);
 
-    // Glow layer
     gfx.lineStyle(6, 0xff8888, 0.35);
     gfx.beginPath();
     gfx.moveTo(this.sprite.x, this.sprite.y);
     gfx.lineTo(ex, ey);
     gfx.strokePath();
 
-    // Core strike
     gfx.lineStyle(3, 0xff2222, 1);
     gfx.beginPath();
     gfx.moveTo(this.sprite.x, this.sprite.y);
@@ -109,44 +105,38 @@ export default class Player {
       onComplete: () => gfx.destroy()
     });
 
-    // === HIT STOP ===
-    this.scene.time.timeScale = 0.92;
-    this.scene.time.delayedCall(40, () => {
-      this.scene.time.timeScale = 1;
-    });
-
-    // === DAMAGE (SINGLE TARGET) ===
     const dmg = Phaser.Math.Between(12, 18);
     enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
-
-    // Damage number
-    const dmgText = this.scene.add.text(
-      ex,
-      ey - 20,
-      `-${dmg}`,
-      {
-        fontSize: "15px",
-        fontFamily: "monospace",
-        color: "#ff2222",
-        stroke: "#000000",
-        strokeThickness: 2
-      }
-    );
-
-    dmgText.setDepth(ey + 10);
-
-    this.scene.tweens.add({
-      targets: dmgText,
-      y: dmgText.y - 24,
-      alpha: 0,
-      duration: 520,
-      onComplete: () => dmgText.destroy()
-    });
   }
 
   takeDamage(amount: number) {
     this.hp = Math.max(0, this.hp - amount);
 
+    // === PLAYER DAMAGE NUMBER (VISIBLE) ===
+    const txt = this.scene.add.text(
+      this.sprite.x,
+      this.sprite.y - 30,
+      `-${amount}`,
+      {
+        fontSize: "18px",
+        fontFamily: "monospace",
+        color: "#ff0000",
+        stroke: "#000000",
+        strokeThickness: 3
+      }
+    );
+
+    txt.setDepth(999);
+
+    this.scene.tweens.add({
+      targets: txt,
+      y: txt.y - 20,
+      alpha: 0,
+      duration: 600,
+      onComplete: () => txt.destroy()
+    });
+
+    // Hit flash
     this.scene.tweens.add({
       targets: this.sprite,
       alpha: 0.6,
