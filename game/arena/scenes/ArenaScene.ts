@@ -8,10 +8,8 @@ export default class ArenaScene extends Phaser.Scene {
   enemies!: EnemyManager;
   hud!: HUD;
 
-  // Run state (v1)
   wave = 1;
   points = 0;
-  playerHp = 100;
 
   constructor() {
     super("ArenaScene");
@@ -27,11 +25,54 @@ export default class ArenaScene extends Phaser.Scene {
 
     this.physics.world.setBounds(0, 0, width, height);
 
-    // === PLAYER ===
-    this.player = new Player(this, width / 2, height / 2);
+    // === ENEMIES MANAGER ===
+    this.enemies = new EnemyManager(this);
 
-    // IMPORTANT: allow enemies to damage player safely
+    // === PLAYER ===
+    this.player = new Player(
+      this,
+      width / 2,
+      height / 2,
+      this.enemies
+    );
+
+    // Allow enemies to damage player safely
     this.player.sprite.setData("ref", this.player);
+
+    // === SCORING ===
+    this.enemies.onEnemyKilled = (points: number) => {
+      this.points += points;
+    };
+
+    // === TEMP: FIRST WAVE SPAWN ===
+    this.enemies.spawnHopGoblin(200, 200);
+    this.enemies.spawnHopGoblin(width - 200, 200);
+    this.enemies.spawnHopGoblin(width / 2, height - 200);
+
+    // === HUD ===
+    this.hud = new HUD(this);
+
+    // === CAMERA ===
+    this.cameras.main.startFollow(
+      this.player.sprite,
+      true,
+      0.08,
+      0.08
+    );
+  }
+
+  update(time: number, delta: number) {
+    this.player.update(delta);
+    this.enemies.update(this.player.sprite);
+
+    this.hud.update(
+      this.player.hp,
+      this.wave,
+      this.points
+    );
+  }
+}
+
 
     // === ENEMIES ===
     this.enemies = new EnemyManager(this);
