@@ -19,7 +19,7 @@ export default class Player {
   attackRange = 55;
   attackCooldown = 350;
   lastAttack = 0;
-  attackDamage = 15;
+  attackDamage = 14;
 
   shadow: Phaser.GameObjects.Ellipse;
 
@@ -98,21 +98,21 @@ export default class Player {
     const strikeX = this.sprite.x + dirX * 26;
     const strikeY = this.sprite.y + dirY * 26;
 
-    // === STRIKE SQUASH (NO JUMP) ===
+    // === PUNCH ANIMATION (NO JUMP) ===
     this.scene.tweens.add({
       targets: this.sprite,
-      scaleX: 0.45,
+      scaleX: 0.48,
       scaleY: 0.38,
-      duration: 60,
+      duration: 50,
       yoyo: true
     });
 
-    // === SLASH EFFECT ===
+    // === SLASH VISUAL ===
     const slash = this.scene.add.rectangle(
       strikeX,
       strikeY,
       30,
-      12,
+      10,
       0xffffff,
       0.25
     );
