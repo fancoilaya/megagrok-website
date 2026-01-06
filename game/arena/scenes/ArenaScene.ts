@@ -45,14 +45,9 @@ export default class ArenaScene extends Phaser.Scene {
     // === HUD ===
     this.hud = new HUD(this);
 
-    // === SCORE CALLBACK ===
+    // === SCORE CALLBACK ONLY ===
     this.enemies.onEnemyKilled = (pts: number) => {
       this.points += pts;
-
-      // Check if wave cleared
-      if (this.enemies.enemies.length === 0 && this.state === "active") {
-        this.onWaveComplete();
-      }
     };
 
     // === CAMERA ===
@@ -71,6 +66,11 @@ export default class ArenaScene extends Phaser.Scene {
     if (this.state === "active") {
       this.player.update(delta);
       this.enemies.update(this.player.sprite);
+
+      // ✅ WAVE COMPLETE CHECK (SAFE PLACE)
+      if (this.enemies.enemies.length === 0) {
+        this.onWaveComplete();
+      }
     }
 
     this.hud.update(
@@ -96,6 +96,8 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   onWaveComplete() {
+    if (this.state !== "active") return; // prevent double trigger
+
     this.state = "between";
 
     this.showWaveText("Wave Complete!");
@@ -134,11 +136,9 @@ export default class ArenaScene extends Phaser.Scene {
       repeat: seconds - 1,
       callback: () => {
         this.countdown--;
-        if (this.countdownText) {
-          this.countdownText.setText(
-            `Next Wave in ${this.countdown}`
-          );
-        }
+        this.countdownText?.setText(
+          `Next Wave in ${this.countdown}`
+        );
 
         if (this.countdown <= 0) {
           timer.remove(false);
@@ -210,7 +210,6 @@ export default class ArenaScene extends Phaser.Scene {
         break;
 
       default:
-        // Loop difficulty for now
         this.spawnWave(3);
         break;
     }
