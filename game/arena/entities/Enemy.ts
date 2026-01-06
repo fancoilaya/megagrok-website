@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+import Player from "./Player";
 
 export default class Enemy {
   scene: Phaser.Scene;
@@ -9,12 +10,13 @@ export default class Enemy {
   defense = 2;
   speed = 120;
 
+  contactDamage = 6;
+
   killPoints = 100;
+  onDeath?: (points: number) => void;
 
   hpBarBg: Phaser.GameObjects.Rectangle;
   hpBar: Phaser.GameObjects.Rectangle;
-
-  onDeath?: (points: number) => void;
 
   constructor(
     scene: Phaser.Scene,
@@ -51,6 +53,9 @@ export default class Enemy {
       this.sprite.setVelocity(nx * this.speed, ny * this.speed);
     } else {
       this.sprite.setVelocity(0, 0);
+
+      // === DEAL DAMAGE TO PLAYER ===
+      (player as any).getData?.("ref")?.takeDamage(this.contactDamage);
     }
 
     this.hpBarBg.setPosition(this.sprite.x, this.sprite.y - 18);
@@ -65,7 +70,6 @@ export default class Enemy {
     const finalDamage = Math.max(1, rawDamage - this.defense);
     this.hp -= finalDamage;
 
-    // Floating damage number
     const dmgText = this.scene.add.text(
       this.sprite.x,
       this.sprite.y - 28,
@@ -89,7 +93,6 @@ export default class Enemy {
       onComplete: () => dmgText.destroy()
     });
 
-    // Knockback
     const dx = this.sprite.x - fromX;
     const dy = this.sprite.y - fromY;
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -99,7 +102,6 @@ export default class Enemy {
       (dy / len) * 160
     );
 
-    // Hit flash
     this.scene.tweens.add({
       targets: this.sprite,
       alpha: 0.6,
@@ -119,9 +121,6 @@ export default class Enemy {
     this.hpBar.destroy();
     this.hpBarBg.destroy();
     this.sprite.destroy();
-
-    if (this.onDeath) {
-      this.onDeath(this.killPoints);
-    }
+    if (this.onDeath) this.onDeath(this.killPoints);
   }
 }
