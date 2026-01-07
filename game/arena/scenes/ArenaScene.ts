@@ -23,6 +23,13 @@ export default class ArenaScene extends Phaser.Scene {
     super("ArenaScene");
   }
 
+  init(): void {
+    this.wave = 1;
+    this.points = 0;
+    this.state = "spawning";
+    this.gameOverContainer = undefined;
+  }
+
   create(): void {
     const { width, height } = this.scale;
 
