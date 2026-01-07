@@ -14,8 +14,10 @@ export default class ArenaScene extends Phaser.Scene {
   points: number = 0;
 
   state: ArenaState = "spawning";
-  countdown: number = 0;
   countdownText?: Phaser.GameObjects.Text;
+
+  // Game Over UI refs
+  gameOverContainer?: Phaser.GameObjects.Container;
 
   constructor() {
     super("ArenaScene");
@@ -63,19 +65,13 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    // ✅ PLAYER CAN ALWAYS MOVE
+    // Player can always move (unless dead)
     this.player.update(delta);
 
     if (this.state === "active") {
       this.enemies.update(this.player.sprite);
 
-      // === PLAYER DEATH ===
-      if (this.player.hp <= 0) {
-        this.onPlayerDeath();
-        return;
-      }
-
-      // === WAVE COMPLETE ===
+      // Wave complete
       if (this.enemies.enemies.length === 0) {
         this.onWaveComplete();
       }
@@ -94,7 +90,6 @@ export default class ArenaScene extends Phaser.Scene {
 
   startWave(wave: number) {
     this.state = "spawning";
-
     this.showWaveText(`Wave ${wave}`);
 
     this.time.delayedCall(800, () => {
@@ -110,50 +105,8 @@ export default class ArenaScene extends Phaser.Scene {
     this.showWaveText("Wave Complete!");
 
     this.time.delayedCall(1000, () => {
-      this.startCountdown(3);
-    });
-  }
-
-  startCountdown(seconds: number) {
-    this.countdown = seconds;
-
-    this.countdownText?.destroy();
-
-    this.countdownText = this.add
-      .text(
-        this.scale.width / 2,
-        this.scale.height / 2,
-        `Next Wave in ${this.countdown}`,
-        {
-          fontSize: "28px",
-          color: "#ffffff",
-          fontFamily: "monospace",
-          stroke: "#000000",
-          strokeThickness: 4
-        }
-      )
-      .setOrigin(0.5)
-      .setDepth(1000)
-      .setScrollFactor(0);
-
-    const timer = this.time.addEvent({
-      delay: 1000,
-      repeat: seconds - 1,
-      callback: () => {
-        this.countdown--;
-        this.countdownText?.setText(
-          `Next Wave in ${this.countdown}`
-        );
-
-        if (this.countdown <= 0) {
-          timer.remove(false);
-          this.countdownText?.destroy();
-          this.countdownText = undefined;
-
-          this.wave++;
-          this.startWave(this.wave);
-        }
-      }
+      this.wave++;
+      this.startWave(this.wave);
     });
   }
 
@@ -185,41 +138,153 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   // =========================
-  // PLAYER DEATH
+  // PLAYER DEATH + GAME OVER
   // =========================
 
   onPlayerDeath() {
     if (this.state === "dead") return;
-
     this.state = "dead";
+
     this.enemies.clearAll();
     this.player.sprite.setVelocity(0, 0);
 
-    const msg = this.add
-      .text(
-        this.scale.width / 2,
-        this.scale.height / 2,
-        "YOU DIED\n\nPress SPACE to Restart",
-        {
-          fontSize: "36px",
-          color: "#ff3333",
-          fontFamily: "monospace",
-          align: "center",
-          stroke: "#000000",
-          strokeThickness: 5
-        }
-      )
-      .setOrigin(0.5)
-      .setDepth(1000)
-      .setScrollFactor(0);
+    const cx = this.scale.width / 2;
+    const cy = this.scale.height / 2;
 
-    const keyboard =
-      this.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+    const bg = this.add
+      .rectangle(cx, cy, 420, 340, 0x000000, 0.85)
+      .setStrokeStyle(2, 0xff4444);
 
-    keyboard.once("keydown-SPACE", () => {
-      msg.destroy();
-      this.scene.restart();
+    const title = this.add.text(cx, cy - 130, "YOU DIED", {
+      fontSize: "36px",
+      color: "#ff4444",
+      fontFamily: "monospace",
+      stroke: "#000000",
+      strokeThickness: 4
+    }).setOrigin(0.5);
+
+    const scoreText = this.add.text(
+      cx,
+      cy - 70,
+      `Final Score: ${this.points}\nWave Reached: ${this.wave - 1}`,
+      {
+        fontSize: "18px",
+        color: "#ffffff",
+        fontFamily: "monospace",
+        align: "center"
+      }
+    ).setOrigin(0.5);
+
+    // Buttons
+    const submitBtn = this.makeButton(
+      cx,
+      cy + 10,
+      "SUBMIT SCORE",
+      () => this.showSubmitForm(cx, cy)
+    );
+
+    const skipBtn = this.makeButton(
+      cx,
+      cy + 60,
+      "SKIP & RESTART",
+      () => this.scene.restart()
+    );
+
+    this.gameOverContainer = this.add.container(0, 0, [
+      bg,
+      title,
+      scoreText,
+      submitBtn,
+      skipBtn
+    ]);
+
+    this.gameOverContainer.setDepth(2000);
+  }
+
+  showSubmitForm(cx: number, cy: number) {
+    this.gameOverContainer?.destroy();
+
+    const bg = this.add
+      .rectangle(cx, cy, 440, 380, 0x000000, 0.9)
+      .setStrokeStyle(2, 0x44ff44);
+
+    const title = this.add.text(cx, cy - 150, "SUBMIT SCORE", {
+      fontSize: "28px",
+      color: "#44ff44",
+      fontFamily: "monospace",
+      stroke: "#000000",
+      strokeThickness: 3
+    }).setOrigin(0.5);
+
+    // DOM inputs
+    const nameInput = this.add.dom(cx, cy - 70, "input", {
+      type: "text",
+      placeholder: "Name",
+      style: "width:260px;padding:6px;font-size:16px;"
     });
+
+    const walletInput = this.add.dom(cx, cy - 20, "input", {
+      type: "text",
+      placeholder: "Wallet Address",
+      style: "width:260px;padding:6px;font-size:16px;"
+    });
+
+    const confirmBtn = this.makeButton(
+      cx,
+      cy + 60,
+      "CONFIRM SUBMIT",
+      () => {
+        const name = (nameInput.node as HTMLInputElement).value.trim();
+        const wallet = (walletInput.node as HTMLInputElement).value.trim();
+
+        if (!name || !wallet) {
+          alert("Name and wallet required");
+          return;
+        }
+
+        // 🔒 STEP 1 ONLY — MOCK SUBMIT
+        console.log("SUBMIT SCORE", {
+          name,
+          wallet,
+          score: this.points,
+          wave: this.wave - 1
+        });
+
+        this.scene.restart();
+      }
+    );
+
+    this.gameOverContainer = this.add.container(0, 0, [
+      bg,
+      title,
+      nameInput,
+      walletInput,
+      confirmBtn
+    ]);
+
+    this.gameOverContainer.setDepth(2000);
+  }
+
+  makeButton(
+    x: number,
+    y: number,
+    label: string,
+    onClick: () => void
+  ) {
+    const btnBg = this.add
+      .rectangle(x, y, 260, 40, 0x222222)
+      .setStrokeStyle(2, 0xffffff)
+      .setInteractive({ useHandCursor: true });
+
+    const btnText = this.add.text(x, y, label, {
+      fontSize: "16px",
+      color: "#ffffff",
+      fontFamily: "monospace"
+    }).setOrigin(0.5);
+
+    btnBg.on("pointerdown", onClick);
+
+    return this.add.container(0, 0, [btnBg, btnText]);
   }
 
   // =========================
@@ -253,10 +318,8 @@ export default class ArenaScene extends Phaser.Scene {
         break;
 
       default:
-        // Loop wave 3 for now
         this.spawnWave(3);
         break;
     }
   }
 }
-
