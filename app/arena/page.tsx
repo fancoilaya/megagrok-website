@@ -33,17 +33,36 @@ function getTimeUntilNextUTCReset() {
 }
 
 /* ---------------------------------------------------------
+   Types
+--------------------------------------------------------- */
+type LeaderboardEntry = {
+  name: string;
+  score: number;
+  wave: number;
+};
+
+/* ---------------------------------------------------------
    Arena Page
 --------------------------------------------------------- */
 export default function ArenaPage() {
   const [time, setTime] = useState(getTimeUntilNextUTCReset());
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
+  // Countdown timer
   useEffect(() => {
     const interval = setInterval(() => {
       setTime(getTimeUntilNextUTCReset());
     }, 1000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Fetch leaderboard
+  useEffect(() => {
+    fetch("/api/leaderboard")
+      .then(res => res.json())
+      .then(setLeaderboard)
+      .catch(() => {});
   }, []);
 
   return (
@@ -124,12 +143,20 @@ export default function ArenaPage() {
                 <th align="left">#</th>
                 <th align="left">Player</th>
                 <th align="right">Score</th>
-                <th align="left">Wallet</th>
+                <th align="left">Wave</th>
                 <th align="right">Reward</th>
               </tr>
             </thead>
             <tbody>
-              {[...Array(10)].map((_, i) => (
+              {leaderboard.length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", opacity: 0.6 }}>
+                    No scores yet today
+                  </td>
+                </tr>
+              )}
+
+              {leaderboard.map((row, i) => (
                 <tr
                   key={i}
                   style={{
@@ -137,9 +164,9 @@ export default function ArenaPage() {
                   }}
                 >
                   <td>{i + 1}</td>
-                  <td>—</td>
-                  <td align="right">—</td>
-                  <td>—</td>
+                  <td>{row.name}</td>
+                  <td align="right">{row.score}</td>
+                  <td>Wave {row.wave}</td>
                   <td align="right">—</td>
                 </tr>
               ))}
