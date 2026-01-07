@@ -14,9 +14,6 @@ export default class ArenaScene extends Phaser.Scene {
   points: number = 0;
 
   state: ArenaState = "spawning";
-  countdownText?: Phaser.GameObjects.Text;
-
-  // Game Over UI refs
   gameOverContainer?: Phaser.GameObjects.Container;
 
   constructor() {
@@ -72,13 +69,11 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    // Player can always move (unless dead)
     this.player.update(delta);
 
     if (this.state === "active") {
       this.enemies.update(this.player.sprite);
 
-      // Wave complete
       if (this.enemies.enemies.length === 0) {
         this.onWaveComplete();
       }
@@ -92,7 +87,7 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   // =========================
-  // WAVE CONTROL
+  // WAVE FLOW
   // =========================
 
   startWave(wave: number) {
@@ -145,7 +140,7 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   // =========================
-  // PLAYER DEATH + GAME OVER
+  // GAME OVER
   // =========================
 
   onPlayerDeath() {
@@ -160,7 +155,7 @@ export default class ArenaScene extends Phaser.Scene {
 
     const bg = this.add
       .rectangle(cx, cy, 420, 340, 0x000000, 0.85)
-      .setStrokeStyle(2, 0xff4444);
+      .setStrokeStyle(2, 0x00ff88);
 
     const title = this.add.text(cx, cy - 130, "YOU DIED", {
       fontSize: "36px",
@@ -182,7 +177,6 @@ export default class ArenaScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    // Buttons
     const submitBtn = this.makeButton(
       cx,
       cy + 10,
@@ -213,17 +207,16 @@ export default class ArenaScene extends Phaser.Scene {
 
     const bg = this.add
       .rectangle(cx, cy, 440, 380, 0x000000, 0.9)
-      .setStrokeStyle(2, 0x44ff44);
+      .setStrokeStyle(2, 0x00ff88);
 
     const title = this.add.text(cx, cy - 150, "SUBMIT SCORE", {
       fontSize: "28px",
-      color: "#44ff44",
+      color: "#00ff88",
       fontFamily: "monospace",
       stroke: "#000000",
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    // DOM inputs
     const nameInput = this.add.dom(cx, cy - 70, "input", {
       type: "text",
       placeholder: "Name",
@@ -249,15 +242,18 @@ export default class ArenaScene extends Phaser.Scene {
           return;
         }
 
-        // 🔒 STEP 1 ONLY — MOCK SUBMIT
-        console.log("SUBMIT SCORE", {
-          name,
-          wallet,
-          score: this.points,
-          wave: this.wave - 1
-        });
-
-        this.scene.restart();
+        fetch("/api/leaderboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            wallet,
+            score: this.points,
+            wave: this.wave - 1
+          })
+        })
+          .then(() => this.scene.restart())
+          .catch(() => alert("Failed to submit score"));
       }
     );
 
@@ -278,24 +274,23 @@ export default class ArenaScene extends Phaser.Scene {
     label: string,
     onClick: () => void
   ) {
-    const btnBg = this.add
+    const bg = this.add
       .rectangle(x, y, 260, 40, 0x222222)
       .setStrokeStyle(2, 0xffffff)
       .setInteractive({ useHandCursor: true });
 
-    const btnText = this.add.text(x, y, label, {
+    const txt = this.add.text(x, y, label, {
       fontSize: "16px",
       color: "#ffffff",
       fontFamily: "monospace"
     }).setOrigin(0.5);
 
-    btnBg.on("pointerdown", onClick);
-
-    return this.add.container(0, 0, [btnBg, btnText]);
+    bg.on("pointerdown", onClick);
+    return this.add.container(0, 0, [bg, txt]);
   }
 
   // =========================
-  // WAVE COMPOSITION
+  // WAVE CONTENT
   // =========================
 
   spawnWave(wave: number) {
@@ -326,7 +321,6 @@ export default class ArenaScene extends Phaser.Scene {
 
       default:
         this.spawnWave(3);
-        break;
     }
   }
 }
