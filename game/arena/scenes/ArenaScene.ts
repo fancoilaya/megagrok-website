@@ -20,6 +20,9 @@ export default class ArenaScene extends Phaser.Scene {
     super("ArenaScene");
   }
 
+  /* ===============================
+     RESET STATE ON RESTART
+  =============================== */
   init(): void {
     this.wave = 1;
     this.points = 0;
@@ -27,20 +30,23 @@ export default class ArenaScene extends Phaser.Scene {
     this.gameOverContainer = undefined;
   }
 
+  /* ===============================
+     CREATE
+  =============================== */
   create(): void {
     const { width, height } = this.scale;
 
-    // === BACKGROUND ===
+    // Background
     this.add
       .image(width / 2, height / 2, "arena-floor")
       .setDisplaySize(width, height);
 
     this.physics.world.setBounds(0, 0, width, height);
 
-    // === ENEMIES ===
+    // Enemies
     this.enemies = new EnemyManager(this);
 
-    // === PLAYER ===
+    // Player
     this.player = new Player(
       this,
       width / 2,
@@ -48,15 +54,15 @@ export default class ArenaScene extends Phaser.Scene {
       this.enemies
     );
 
-    // === HUD ===
+    // HUD
     this.hud = new HUD(this);
 
-    // === SCORE CALLBACK ===
+    // Score hook
     this.enemies.onEnemyKilled = (pts: number) => {
       this.points += pts;
     };
 
-    // === CAMERA ===
+    // Camera
     this.cameras.main.startFollow(
       this.player.sprite,
       true,
@@ -64,16 +70,30 @@ export default class ArenaScene extends Phaser.Scene {
       0.08
     );
 
-    // === START FIRST WAVE ===
+    // Start game
     this.startWave(this.wave);
   }
 
+  /* ===============================
+     UPDATE LOOP (CRASH SAFE)
+  =============================== */
   update(_time: number, delta: number): void {
+    // 🚨 HARD STOP AFTER DEATH
+    if (this.state === "dead") {
+      this.hud.update(
+        this.player.hp,
+        this.wave,
+        this.points
+      );
+      return;
+    }
+
     this.player.update(delta);
 
     if (this.state === "active") {
       this.enemies.update(this.player.sprite);
 
+      // Wave finished
       if (this.enemies.enemies.length === 0) {
         this.onWaveComplete();
       }
@@ -86,15 +106,15 @@ export default class ArenaScene extends Phaser.Scene {
     );
   }
 
-  // =========================
-  // WAVE FLOW
-  // =========================
-
+  /* ===============================
+     WAVES
+  =============================== */
   startWave(wave: number) {
     this.state = "spawning";
     this.showWaveText(`Wave ${wave}`);
 
     this.time.delayedCall(800, () => {
+      if (this.state === "dead") return;
       this.spawnWave(wave);
       this.state = "active";
     });
@@ -107,6 +127,7 @@ export default class ArenaScene extends Phaser.Scene {
     this.showWaveText("Wave Complete!");
 
     this.time.delayedCall(1000, () => {
+      if (this.state === "dead") return;
       this.wave++;
       this.startWave(this.wave);
     });
@@ -139,10 +160,9 @@ export default class ArenaScene extends Phaser.Scene {
     });
   }
 
-  // =========================
-  // GAME OVER
-  // =========================
-
+  /* ===============================
+     GAME OVER (STABLE)
+  =============================== */
   onPlayerDeath() {
     if (this.state === "dead") return;
     this.state = "dead";
@@ -154,7 +174,7 @@ export default class ArenaScene extends Phaser.Scene {
     const cy = this.scale.height / 2;
 
     const bg = this.add
-      .rectangle(cx, cy, 420, 340, 0x000000, 0.85)
+      .rectangle(cx, cy, 420, 340, 0x000000, 0.9)
       .setStrokeStyle(2, 0x00ff88);
 
     const title = this.add.text(cx, cy - 130, "YOU DIED", {
@@ -206,7 +226,7 @@ export default class ArenaScene extends Phaser.Scene {
     this.gameOverContainer?.destroy();
 
     const bg = this.add
-      .rectangle(cx, cy, 440, 380, 0x000000, 0.9)
+      .rectangle(cx, cy, 440, 380, 0x000000, 0.95)
       .setStrokeStyle(2, 0x00ff88);
 
     const title = this.add.text(cx, cy - 150, "SUBMIT SCORE", {
@@ -289,10 +309,9 @@ export default class ArenaScene extends Phaser.Scene {
     return this.add.container(0, 0, [bg, txt]);
   }
 
-  // =========================
-  // WAVE CONTENT
-  // =========================
-
+  /* ===============================
+     WAVE CONTENT
+  =============================== */
   spawnWave(wave: number) {
     const w = this.scale.width;
     const h = this.scale.height;
@@ -321,6 +340,7 @@ export default class ArenaScene extends Phaser.Scene {
 
       default:
         this.spawnWave(3);
+        break;
     }
   }
 }
