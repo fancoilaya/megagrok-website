@@ -7,9 +7,10 @@ export default class Player {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   keys: any;
 
-  speed = 210; // ⬅️ slowed down
+  speed = 210;
   hp = 100;
   maxHp = 100;
+  isDead = false;
 
   attackCooldown = 420;
   lastAttack = 0;
@@ -30,6 +31,7 @@ export default class Player {
       .sprite(x, y, "grok")
       .setCollideWorldBounds(true);
 
+    // Player visual scale (30% smaller)
     this.sprite.setScale(0.27);
     this.sprite.setData("ref", this);
 
@@ -41,6 +43,11 @@ export default class Player {
   }
 
   update(_delta: number) {
+    if (this.isDead) {
+      this.sprite.setVelocity(0, 0);
+      return;
+    }
+
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
     let vx = 0;
@@ -65,6 +72,8 @@ export default class Player {
   }
 
   performAttack() {
+    if (this.isDead) return;
+
     const now = this.scene.time.now;
     if (now - this.lastAttack < this.attackCooldown) return;
     this.lastAttack = now;
@@ -80,18 +89,21 @@ export default class Player {
     const ex = enemy.sprite.x;
     const ey = enemy.sprite.y;
 
+    // Face target
     this.sprite.setFlipX(ex < this.sprite.x);
 
-    // Force strike visual (unchanged)
+    // === FORCE STRIKE VISUAL (TARGETED, SINGLE TARGET) ===
     const gfx = this.scene.add.graphics();
     gfx.setDepth(Math.max(this.sprite.y, ey) + 5);
 
+    // Glow
     gfx.lineStyle(6, 0xff8888, 0.35);
     gfx.beginPath();
     gfx.moveTo(this.sprite.x, this.sprite.y);
     gfx.lineTo(ex, ey);
     gfx.strokePath();
 
+    // Core
     gfx.lineStyle(3, 0xff2222, 1);
     gfx.beginPath();
     gfx.moveTo(this.sprite.x, this.sprite.y);
@@ -110,9 +122,11 @@ export default class Player {
   }
 
   takeDamage(amount: number) {
+    if (this.isDead) return;
+
     this.hp = Math.max(0, this.hp - amount);
 
-    // === PLAYER DAMAGE NUMBER (VISIBLE) ===
+    // === DAMAGE NUMBER (VERY VISIBLE) ===
     const txt = this.scene.add.text(
       this.sprite.x,
       this.sprite.y - 30,
@@ -143,5 +157,11 @@ export default class Player {
       duration: 60,
       yoyo: true
     });
+
+    // === DEATH (IMMEDIATE) ===
+    if (this.hp <= 0) {
+      this.isDead = true;
+      (this.scene as any).onPlayerDeath?.();
+    }
   }
 }
