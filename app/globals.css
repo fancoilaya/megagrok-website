@@ -27,6 +27,80 @@ a {
 }
 
 /* =========================================================
+   PHASER / ARENA SUPPORT (NEW – REQUIRED)
+========================================================= */
+
+/* Ensure Phaser canvas stays below DOM UI */
+canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+/* Phaser DOM container (used for submit score UI) */
+.phaser-dom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* Game over / submit overlay styling */
+.arena-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 4, 20, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.arena-overlay form {
+  background: rgba(10, 6, 28, 0.95);
+  border: 3px solid #3cff00;
+  padding: 32px;
+  border-radius: 12px;
+  min-width: 300px;
+  box-shadow: 0 0 60px rgba(60, 255, 0, 0.25);
+}
+
+.arena-overlay h2 {
+  font-family: 'Anton', sans-serif;
+  color: #3cff00;
+  text-align: center;
+  margin-bottom: 20px;
+  letter-spacing: 0.12em;
+}
+
+.arena-overlay input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  background: #060414;
+  border: 1px solid #3cff00;
+  color: #fff;
+  font-size: 14px;
+}
+
+.arena-overlay button {
+  width: 100%;
+  padding: 10px;
+  background: #3cff00;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.arena-overlay .skip {
+  margin-top: 10px;
+  background: transparent;
+  color: #aaa;
+  border: 1px dashed #555;
+}
+
+/* =========================================================
    LAYOUT
 ========================================================= */
 .container {
