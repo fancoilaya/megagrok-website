@@ -18,21 +18,29 @@ export default class ArenaScene extends Phaser.Scene {
     super("ArenaScene");
   }
 
+  /* ===============================
+     RESET
+  =============================== */
   init(): void {
     this.wave = 1;
     this.points = 0;
     this.state = "spawning";
   }
 
+  /* ===============================
+     CREATE
+  =============================== */
   create(): void {
     const { width, height } = this.scale;
 
+    // Background
     this.add
       .image(width / 2, height / 2, "arena-floor")
       .setDisplaySize(width, height);
 
     this.physics.world.setBounds(0, 0, width, height);
 
+    // Systems
     this.enemies = new EnemyManager(this);
 
     this.player = new Player(
@@ -44,10 +52,12 @@ export default class ArenaScene extends Phaser.Scene {
 
     this.hud = new HUD(this);
 
+    // Score hook
     this.enemies.onEnemyKilled = (pts: number) => {
       this.points += pts;
     };
 
+    // Camera
     this.cameras.main.startFollow(
       this.player.sprite,
       true,
@@ -58,8 +68,19 @@ export default class ArenaScene extends Phaser.Scene {
     this.startWave(this.wave);
   }
 
+  /* ===============================
+     UPDATE (HUD SAFE)
+  =============================== */
   update(_time: number, delta: number): void {
-    if (this.state === "dead") return;
+    // 🔑 HUD must always update
+    if (this.state === "dead") {
+      this.hud.update(
+        this.player.hp,
+        this.wave,
+        this.points
+      );
+      return;
+    }
 
     this.player.update(delta);
 
@@ -78,6 +99,9 @@ export default class ArenaScene extends Phaser.Scene {
     );
   }
 
+  /* ===============================
+     WAVES
+  =============================== */
   startWave(wave: number) {
     this.state = "spawning";
     this.showWaveText(`Wave ${wave}`);
@@ -146,25 +170,29 @@ export default class ArenaScene extends Phaser.Scene {
       .rectangle(cx, cy, 420, 300, 0x000000, 0.9)
       .setStrokeStyle(2, 0x00ff88);
 
-    const title = this.add.text(cx, cy - 110, "YOU DIED", {
-      fontSize: "36px",
-      color: "#ff4444",
-      fontFamily: "monospace",
-      stroke: "#000000",
-      strokeThickness: 4
-    }).setOrigin(0.5);
-
-    const scoreText = this.add.text(
-      cx,
-      cy - 50,
-      `Final Score: ${this.points}\nWave Reached: ${this.wave - 1}`,
-      {
-        fontSize: "18px",
-        color: "#ffffff",
+    const title = this.add
+      .text(cx, cy - 110, "YOU DIED", {
+        fontSize: "36px",
+        color: "#ff4444",
         fontFamily: "monospace",
-        align: "center"
-      }
-    ).setOrigin(0.5);
+        stroke: "#000000",
+        strokeThickness: 4
+      })
+      .setOrigin(0.5);
+
+    const scoreText = this.add
+      .text(
+        cx,
+        cy - 50,
+        `Final Score: ${this.points}\nWave Reached: ${this.wave - 1}`,
+        {
+          fontSize: "18px",
+          color: "#ffffff",
+          fontFamily: "monospace",
+          align: "center"
+        }
+      )
+      .setOrigin(0.5);
 
     const submitBtn = this.makeButton(
       cx,
@@ -182,14 +210,19 @@ export default class ArenaScene extends Phaser.Scene {
       }
     );
 
-    this.add.container(0, 0, [
-      bg,
-      title,
-      scoreText,
-      submitBtn
-    ]).setDepth(2000);
+    this.add
+      .container(0, 0, [
+        bg,
+        title,
+        scoreText,
+        submitBtn
+      ])
+      .setDepth(2000);
   }
 
+  /* ===============================
+     BUTTON
+  =============================== */
   makeButton(
     x: number,
     y: number,
@@ -201,16 +234,21 @@ export default class ArenaScene extends Phaser.Scene {
       .setStrokeStyle(2, 0xffffff)
       .setInteractive({ useHandCursor: true });
 
-    const txt = this.add.text(x, y, label, {
-      fontSize: "16px",
-      color: "#ffffff",
-      fontFamily: "monospace"
-    }).setOrigin(0.5);
+    const txt = this.add
+      .text(x, y, label, {
+        fontSize: "16px",
+        color: "#ffffff",
+        fontFamily: "monospace"
+      })
+      .setOrigin(0.5);
 
     bg.on("pointerdown", onClick);
     return this.add.container(0, 0, [bg, txt]);
   }
 
+  /* ===============================
+     ENEMIES
+  =============================== */
   spawnWave(wave: number) {
     const w = this.scale.width;
     const h = this.scale.height;
