@@ -35,6 +35,8 @@ export default class ArenaScene extends Phaser.Scene {
   const width = this.scale.gameSize.width;
   const height = this.scale.gameSize.height;
 
+   this.input.keyboard?.clearCaptures();
+
   // Camera & physics bounds
   this.cameras.main.setBounds(0, 0, width, height);
   this.physics.world.setBounds(0, 0, width, height);
@@ -172,6 +174,7 @@ onPlayerDeath() {
 
   this.state = "dead";
 
+  this.player.disableInput();
   // Stop gameplay safely
   this.enemies.clearAll();
   this.player.sprite.setVelocity(0, 0);
