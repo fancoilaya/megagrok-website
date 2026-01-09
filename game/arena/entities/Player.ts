@@ -1,167 +1,116 @@
-import * as Phaser from "phaser";
-import EnemyManager from "../systems/EnemyManager";
+import Phaser from "phaser";
 
-export default class Player {
-  scene: Phaser.Scene;
-  sprite: Phaser.Physics.Arcade.Sprite;
+const MAX_SPEED = 220;
+const ACCELERATION = 1200;
+const DRAG = 1600;
+
+export default class Player extends Phaser.Physics.Arcade.Sprite {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-  keys: any;
+  speed: number;
+  health: number;
+  lastAttack: number;
+  attackCooldown: number;
+  facing: "up" | "down" | "left" | "right" = "down";
 
-  speed = 210;
-  hp = 100;
-  maxHp = 100;
-  isDead = false;
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x, y, "grok-player");
 
-  attackCooldown = 420;
-  lastAttack = 0;
-  attackRange = 120;
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
 
-  enemyManager: EnemyManager;
+    this.setCollideWorldBounds(true);
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    enemyManager: EnemyManager
-  ) {
-    this.scene = scene;
-    this.enemyManager = enemyManager;
+    this.cursors = scene.input.keyboard.createCursorKeys();
+    this.speed = MAX_SPEED;
+    this.health = 100;
 
-    this.sprite = scene.physics.add
-      .sprite(x, y, "grok")
-      .setCollideWorldBounds(true);
-
-    // Player visual scale (30% smaller)
-    this.sprite.setScale(0.27);
-    this.sprite.setData("ref", this);
-
-    const keyboard =
-      scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
-
-    this.cursors = keyboard.createCursorKeys();
-    this.keys = keyboard.addKeys("W,A,S,D,SPACE");
+    this.lastAttack = 0;
+    this.attackCooldown = 400;
   }
 
-  update(_delta: number) {
-    if (this.isDead) {
-      this.sprite.setVelocity(0, 0);
-      return;
+  update(time: number) {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+
+    let inputX = 0;
+    let inputY = 0;
+
+    if (this.cursors.left?.isDown) inputX -= 1;
+    if (this.cursors.right?.isDown) inputX += 1;
+    if (this.cursors.up?.isDown) inputY -= 1;
+    if (this.cursors.down?.isDown) inputY += 1;
+
+    // Normalize diagonal movement
+    if (inputX !== 0 && inputY !== 0) {
+      inputX *= Math.SQRT1_2;
+      inputY *= Math.SQRT1_2;
     }
 
-    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+    const targetVX = inputX * MAX_SPEED;
+    const targetVY = inputY * MAX_SPEED;
 
-    let vx = 0;
-    let vy = 0;
+    const delta = this.scene.game.loop.delta / 1000;
 
-    if (this.cursors.left?.isDown || this.keys.A?.isDown) vx = -1;
-    if (this.cursors.right?.isDown || this.keys.D?.isDown) vx = 1;
-    if (this.cursors.up?.isDown || this.keys.W?.isDown) vy = -1;
-    if (this.cursors.down?.isDown || this.keys.S?.isDown) vy = 1;
-
-    body.setVelocity(vx * this.speed, vy * this.speed);
-
-    if (vx !== 0) {
-      this.sprite.setFlipX(vx < 0);
-    }
-
-    this.sprite.setDepth(this.sprite.y);
-
-    if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
-      this.performAttack();
-    }
-  }
-
-  performAttack() {
-    if (this.isDead) return;
-
-    const now = this.scene.time.now;
-    if (now - this.lastAttack < this.attackCooldown) return;
-    this.lastAttack = now;
-
-    const enemy = this.enemyManager.getClosestEnemy(
-      this.sprite.x,
-      this.sprite.y,
-      this.attackRange
+    // Smooth acceleration toward target velocity
+    body.velocity.x = Phaser.Math.Linear(
+      body.velocity.x,
+      targetVX,
+      ACCELERATION * delta
     );
 
-    if (!enemy) return;
+    body.velocity.y = Phaser.Math.Linear(
+      body.velocity.y,
+      targetVY,
+      ACCELERATION * delta
+    );
 
-    const ex = enemy.sprite.x;
-    const ey = enemy.sprite.y;
+    // Apply drag when no input
+    if (inputX === 0) {
+      body.velocity.x = Phaser.Math.Linear(
+        body.velocity.x,
+        0,
+        DRAG * delta
+      );
+    }
 
-    // Face target
-    this.sprite.setFlipX(ex < this.sprite.x);
+    if (inputY === 0) {
+      body.velocity.y = Phaser.Math.Linear(
+        body.velocity.y,
+        0,
+        DRAG * delta
+      );
+    }
 
-    // === FORCE STRIKE VISUAL (TARGETED, SINGLE TARGET) ===
-    const gfx = this.scene.add.graphics();
-    gfx.setDepth(Math.max(this.sprite.y, ey) + 5);
-
-    // Glow
-    gfx.lineStyle(6, 0xff8888, 0.35);
-    gfx.beginPath();
-    gfx.moveTo(this.sprite.x, this.sprite.y);
-    gfx.lineTo(ex, ey);
-    gfx.strokePath();
-
-    // Core
-    gfx.lineStyle(3, 0xff2222, 1);
-    gfx.beginPath();
-    gfx.moveTo(this.sprite.x, this.sprite.y);
-    gfx.lineTo(ex, ey);
-    gfx.strokePath();
-
-    this.scene.tweens.add({
-      targets: gfx,
-      alpha: 0,
-      duration: 120,
-      onComplete: () => gfx.destroy()
-    });
-
-    const dmg = Phaser.Math.Between(12, 18);
-    enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
+    // Update facing direction
+    if (Math.abs(body.velocity.x) > Math.abs(body.velocity.y)) {
+      if (body.velocity.x > 10) this.facing = "right";
+      else if (body.velocity.x < -10) this.facing = "left";
+    } else {
+      if (body.velocity.y > 10) this.facing = "down";
+      else if (body.velocity.y < -10) this.facing = "up";
+    }
   }
 
   takeDamage(amount: number) {
-    if (this.isDead) return;
-
-    this.hp = Math.max(0, this.hp - amount);
-
-    // === DAMAGE NUMBER (VERY VISIBLE) ===
-    const txt = this.scene.add.text(
-      this.sprite.x,
-      this.sprite.y - 30,
-      `-${amount}`,
-      {
-        fontSize: "18px",
-        fontFamily: "monospace",
-        color: "#ff0000",
-        stroke: "#000000",
-        strokeThickness: 3
-      }
-    );
-
-    txt.setDepth(999);
+    this.health -= amount;
 
     this.scene.tweens.add({
-      targets: txt,
-      y: txt.y - 20,
-      alpha: 0,
-      duration: 600,
-      onComplete: () => txt.destroy()
+      targets: this,
+      alpha: 0.5,
+      duration: 100,
+      yoyo: true,
     });
 
-    // Hit flash
-    this.scene.tweens.add({
-      targets: this.sprite,
-      alpha: 0.6,
-      duration: 60,
-      yoyo: true
-    });
-
-    // === DEATH (IMMEDIATE) ===
-    if (this.hp <= 0) {
-      this.isDead = true;
-      (this.scene as any).onPlayerDeath?.();
+    if (this.health <= 0) {
+      this.emit("dead");
+      this.destroy();
     }
+  }
+
+  canAttack(time: number): boolean {
+    return time > this.lastAttack + this.attackCooldown;
+  }
+
+  registerAttack(time: number) {
+    this.lastAttack = time;
   }
 }
