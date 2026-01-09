@@ -55,6 +55,11 @@ canvas {
   justify-content: center;
   background: rgba(6, 4, 20, 0.92);
   z-index: 9999;
+  pointer-events: auto;
+}
+
+#arena-game {
+  pointer-events: auto;
 }
 
 .arena-overlay form {
