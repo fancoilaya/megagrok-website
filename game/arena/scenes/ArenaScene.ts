@@ -57,6 +57,7 @@ export default class ArenaScene extends Phaser.Scene {
 
   // HUD (screen-space)
   this.hud = new HUD(this);
+   console.log("HUD CREATED");
 
   // Score hook
   this.enemies.onEnemyKilled = (pts: number) => {
