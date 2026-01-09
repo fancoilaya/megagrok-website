@@ -44,45 +44,79 @@ export default function ArenaPlayPage() {
   }, [view]);
 
   /* ===============================
-     FULLSCREEN SHELL (IMPORTANT)
+     FULLSCREEN SHELL
   =============================== */
   return (
     <div
       style={{
         position: "fixed",
         inset: 0,
-        background: "#060414"
+        background: "#060414",
+        overflow: "hidden"
       }}
     >
       {/* ===============================
-          LAUNCHER
+          LAUNCHER — VARIANT B
       =============================== */}
       {view === "launcher" && (
         <div className="arena-overlay">
-          <div style={{ maxWidth: 520, textAlign: "center" }}>
-            <h2>THE ARENA</h2>
+          <div style={{ maxWidth: 620, textAlign: "center" }}>
+            <img
+              src="/arena/grok-player.png"
+              alt="MegaGrok"
+              style={{
+                width: 220,
+                marginBottom: 28,
+                imageRendering: "pixelated",
+                filter: "drop-shadow(0 0 18px rgba(0,255,136,0.45))"
+              }}
+            />
 
-            <p style={{ marginBottom: 16 }}>
+            <h2 style={{ marginBottom: 8 }}>
+              THE ARENA
+            </h2>
+
+            <p style={{ opacity: 0.9, marginBottom: 20 }}>
+              A living universe shaped by players.
+            </p>
+
+            <p style={{ marginBottom: 20 }}>
               Survive as many waves as you can.
               <br />
-              One life. One run. One score.
+              <strong>
+                One life. One run. One score.
+              </strong>
             </p>
 
-            <p
+            <div
               style={{
                 fontSize: 14,
-                opacity: 0.85,
-                marginBottom: 24
+                textAlign: "left",
+                margin: "0 auto 28px",
+                maxWidth: 420,
+                lineHeight: 1.7,
+                opacity: 0.9
               }}
             >
-              Enemies scale every wave.
-              <br />
-              Higher waves mean higher rank.
-              <br />
-              Leaderboards reset daily.
-            </p>
+              <div>
+                <strong>🕹 Movement</strong> — WASD / Arrow Keys
+              </div>
+              <div>
+                <strong>⚔ Attack</strong> — Mouse Click / Space
+              </div>
+              <div>
+                <strong>🧠 Survival</strong> — Positioning beats damage
+              </div>
+              <div>
+                <strong>📈 Progression</strong> — Enemies scale every wave
+              </div>
+              <div>
+                <strong>🏆 Ranking</strong> — Leaderboards reset daily
+              </div>
+            </div>
 
             <button
+              style={{ marginBottom: 8 }}
               onClick={() => {
                 setScoreData(null);
                 setView("running");
@@ -90,6 +124,10 @@ export default function ArenaPlayPage() {
             >
               START RUN
             </button>
+
+            <div style={{ fontSize: 12, opacity: 0.6 }}>
+              Death ends the run.
+            </div>
           </div>
         </div>
       )}
