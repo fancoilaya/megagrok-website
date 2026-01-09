@@ -248,6 +248,18 @@ export default class ArenaScene extends Phaser.Scene {
       placeholder: "Wallet Address",
       style: "width:260px;padding:6px;font-size:16px;"
     });
+    // ===============================
+// PATCH: FORCE DOM INPUT VISIBILITY
+// ===============================
+nameInput.setDepth(10000);
+walletInput.setDepth(10000);
+
+nameInput.setScrollFactor(0);
+walletInput.setScrollFactor(0);
+
+this.children.bringToTop(nameInput);
+this.children.bringToTop(walletInput);
+// ===============================
 
     const confirmBtn = this.makeButton(
       cx,
