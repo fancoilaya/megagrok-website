@@ -174,7 +174,9 @@ onPlayerDeath() {
   this.player.sprite.setVelocity(0, 0);
   
    // 🔑 Disable Phaser keyboard so DOM inputs work
-  this.input.keyboard?.enabled = false;
+  if (this.input.keyboard) {
+  this.input.keyboard.enabled = false;
+}
 
   // Emit run result to React
   window.dispatchEvent(
