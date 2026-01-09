@@ -177,11 +177,14 @@ export default function ArenaPlayPage() {
           SUBMIT FORM
       =============================== */}
       {view === "summary-submit" && scoreData && (
-        <div className="arena-overlay">
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const form = e.currentTarget;
+  <div className="arena-overlay">
+    <form
+      onKeyDownCapture={(e) => {
+        e.stopPropagation();
+      }}
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
 
               const name = (form.name as any).value.trim();
               const wallet = (form.wallet as any).value.trim();
