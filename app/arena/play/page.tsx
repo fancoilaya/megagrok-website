@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { startArenaGame } from "@/game/arena/Game";
 
-type ArenaView = "launcher" | "running" | "summary";
+type ArenaView =
+  | "launcher"
+  | "running"
+  | "summary"
+  | "summary-submit";
 
 export default function ArenaPlayPage() {
   const [view, setView] = useState<ArenaView>("launcher");
@@ -119,7 +123,7 @@ export default function ArenaPlayPage() {
   }
 
   /* ===============================
-     SUBMIT FORM (INSIDE SUMMARY)
+     SUBMIT FORM
   =============================== */
   if (view === "summary-submit" && scoreData) {
     return (
