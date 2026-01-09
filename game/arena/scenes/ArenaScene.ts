@@ -240,13 +240,13 @@ export default class ArenaScene extends Phaser.Scene {
     const nameInput = this.add.dom(cx, cy - 70, "input", {
       type: "text",
       placeholder: "Name",
-      style: "width:260px;padding:6px;font-size:16px;"
+      style: "width:260px;padding:6px;font-size:16px;background:#ffffff;color:#000000;border:2px solid #00ff88;"
     });
 
     const walletInput = this.add.dom(cx, cy - 20, "input", {
       type: "text",
       placeholder: "Wallet Address",
-      style: "width:260px;padding:6px;font-size:16px;"
+      style: "width:260px;padding:6px;font-size:16px;background:#ffffff;color:#000000;border:2px solid #00ff88;"
     });
     
     nameInput.setScrollFactor(0);
