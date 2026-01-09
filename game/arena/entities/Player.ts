@@ -179,4 +179,24 @@ private inputEnabled = true;
   enableInput() {
     this.inputEnabled = true;
   }
+  // 🔑 completely release WASD back to the browser
+  destroyKeys() {
+    if (!this.scene.input.keyboard) return;
+
+    this.scene.input.keyboard.removeKey(
+      Phaser.Input.Keyboard.KeyCodes.W
+    );
+    this.scene.input.keyboard.removeKey(
+      Phaser.Input.Keyboard.KeyCodes.A
+    );
+    this.scene.input.keyboard.removeKey(
+      Phaser.Input.Keyboard.KeyCodes.S
+    );
+    this.scene.input.keyboard.removeKey(
+      Phaser.Input.Keyboard.KeyCodes.D
+    );
+    this.scene.input.keyboard.removeKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
+  }
 }
