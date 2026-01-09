@@ -45,11 +45,11 @@ private inputEnabled = true;
   }
 
   update(_delta: number) {
-    if (!this.inputEnabled) {
+    if (this.isDead) {
   this.sprite.setVelocity(0, 0);
   return;
 }
-    if (this.isDead) {
+    if (!this.inputEnabled) {
       this.sprite.setVelocity(0, 0);
       return;
     }
