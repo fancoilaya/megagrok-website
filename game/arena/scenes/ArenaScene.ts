@@ -238,28 +238,41 @@ export default class ArenaScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
   // ===== CORRECT PHASER DOM INPUTS =====
-    const nameInput = this.add.dom(
-      cx,
-      cy - 70,
-      "input",
-      "width:260px;padding:8px;font-size:16px;background:#ffffff;color:#000000;border:2px solid #00ff88;"
-    ) as Phaser.GameObjects.DOMElement;
+const nameInput = this.add.dom(cx, cy - 70).createFromHTML(`
+  <input
+    type="text"
+    placeholder="Name"
+    style="
+      width:260px;
+      padding:8px;
+      font-size:16px;
+      background:#ffffff;
+      color:#000000;
+      border:2px solid #00ff88;
+      outline:none;
+    "
+  />
+`);
 
-    const walletInput = this.add.dom(
-      cx,
-      cy - 20,
-      "input",
-      "width:260px;padding:8px;font-size:16px;background:#ffffff;color:#000000;border:2px solid #00ff88;"
-    ) as Phaser.GameObjects.DOMElement;
+const walletInput = this.add.dom(cx, cy - 20).createFromHTML(`
+  <input
+    type="text"
+    placeholder="Wallet Address"
+    style="
+      width:260px;
+      padding:8px;
+      font-size:16px;
+      background:#ffffff;
+      color:#000000;
+      border:2px solid #00ff88;
+      outline:none;
+    "
+  />
+`);
 
-    (nameInput.node as HTMLInputElement).type = "text";
-    (nameInput.node as HTMLInputElement).placeholder = "Name";
+nameInput.setScrollFactor(0);
+walletInput.setScrollFactor(0);
 
-    (walletInput.node as HTMLInputElement).type = "text";
-    (walletInput.node as HTMLInputElement).placeholder = "Wallet Address";
-
-    nameInput.setScrollFactor(0);
-    walletInput.setScrollFactor(0);
     // ====================================
     const nameEl = nameInput.node as HTMLInputElement;
     const walletEl = walletInput.node as HTMLInputElement;
