@@ -175,6 +175,7 @@ onPlayerDeath() {
   this.state = "dead";
 
   this.player.disableInput();
+  this.player.destroyKeys();
   // Stop gameplay safely
   this.enemies.clearAll();
   this.player.sprite.setVelocity(0, 0);
