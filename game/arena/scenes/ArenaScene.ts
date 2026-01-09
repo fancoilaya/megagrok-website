@@ -156,69 +156,25 @@ export default class ArenaScene extends Phaser.Scene {
   /* ===============================
      GAME OVER
   =============================== */
-  onPlayerDeath() {
-    if (this.state === "dead") return;
-    this.state = "dead";
+onPlayerDeath() {
+  if (this.state === "dead") return;
 
-    this.enemies.clearAll();
-    this.player.sprite.setVelocity(0, 0);
+  this.state = "dead";
 
-    const cx = this.scale.width / 2;
-    const cy = this.scale.height / 2;
+  // Stop gameplay safely
+  this.enemies.clearAll();
+  this.player.sprite.setVelocity(0, 0);
 
-    const bg = this.add
-      .rectangle(cx, cy, 420, 300, 0x000000, 0.9)
-      .setStrokeStyle(2, 0x00ff88);
-
-    const title = this.add
-      .text(cx, cy - 110, "YOU DIED", {
-        fontSize: "36px",
-        color: "#ff4444",
-        fontFamily: "monospace",
-        stroke: "#000000",
-        strokeThickness: 4
-      })
-      .setOrigin(0.5);
-
-    const scoreText = this.add
-      .text(
-        cx,
-        cy - 50,
-        `Final Score: ${this.points}\nWave Reached: ${this.wave - 1}`,
-        {
-          fontSize: "18px",
-          color: "#ffffff",
-          fontFamily: "monospace",
-          align: "center"
-        }
-      )
-      .setOrigin(0.5);
-
-    const submitBtn = this.makeButton(
-      cx,
-      cy + 40,
-      "SUBMIT SCORE",
-      () => {
-        window.dispatchEvent(
-          new CustomEvent("arena:submit-score", {
-            detail: {
-              score: this.points,
-              wave: this.wave - 1
-            }
-          })
-        );
+  // Emit run result to React
+  window.dispatchEvent(
+    new CustomEvent("arena:submit-score", {
+      detail: {
+        score: this.points,
+        wave: this.wave - 1
       }
-    );
-
-    this.add
-      .container(0, 0, [
-        bg,
-        title,
-        scoreText,
-        submitBtn
-      ])
-      .setDepth(2000);
-  }
+    })
+  );
+}
 
   /* ===============================
      BUTTON
