@@ -172,6 +172,9 @@ onPlayerDeath() {
   // Stop gameplay safely
   this.enemies.clearAll();
   this.player.sprite.setVelocity(0, 0);
+  
+   // 🔑 Disable Phaser keyboard so DOM inputs work
+  this.input.keyboard?.enabled = false;
 
   // Emit run result to React
   window.dispatchEvent(
