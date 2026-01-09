@@ -39,6 +39,9 @@ export default class ArenaScene extends Phaser.Scene {
   this.cameras.main.setBounds(0, 0, width, height);
   this.physics.world.setBounds(0, 0, width, height);
 
+   // Releases WASD back to the browser
+   this.input.keyboard?.clearCaptures();
+   
   // Background
   this.add
     .image(width / 2, height / 2, "arena-floor")
