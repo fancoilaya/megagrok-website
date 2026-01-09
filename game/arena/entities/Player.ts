@@ -14,106 +14,143 @@ export default class Player {
 
   attackCooldown = 420;
   lastAttack = 0;
+  attackRange = 120;
 
-  // === NEW: movement feel tuning ===
-  private velocityX = 0;
-  private velocityY = 0;
-  private readonly MAX_SPEED = 220;
-  private readonly ACCELERATION = 1400;
-  private readonly DRAG = 1800;
+  enemyManager: EnemyManager;
 
-  // === NEW: facing direction (additive, not yet used) ===
-  facing: "up" | "down" | "left" | "right" = "down";
-
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    enemyManager: EnemyManager
+  ) {
     this.scene = scene;
+    this.enemyManager = enemyManager;
 
-    this.sprite = scene.physics.add.sprite(x, y, "grok-player");
-    this.sprite.setCollideWorldBounds(true);
+    this.sprite = scene.physics.add
+      .sprite(x, y, "grok")
+      .setCollideWorldBounds(true);
 
-    this.cursors = scene.input.keyboard!.createCursorKeys();
-    this.keys = scene.input.keyboard!.addKeys("W,A,S,D");
+    // Player visual scale (30% smaller)
+    this.sprite.setScale(0.27);
+    this.sprite.setData("ref", this);
+
+    const keyboard =
+      scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+
+    this.cursors = keyboard.createCursorKeys();
+    this.keys = keyboard.addKeys("W,A,S,D,SPACE");
   }
 
-  update(time: number, enemyManager: EnemyManager) {
+  update(_delta: number) {
+    if (this.isDead) {
+      this.sprite.setVelocity(0, 0);
+      return;
+    }
+
+    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+
+    let vx = 0;
+    let vy = 0;
+
+    if (this.cursors.left?.isDown || this.keys.A?.isDown) vx = -1;
+    if (this.cursors.right?.isDown || this.keys.D?.isDown) vx = 1;
+    if (this.cursors.up?.isDown || this.keys.W?.isDown) vy = -1;
+    if (this.cursors.down?.isDown || this.keys.S?.isDown) vy = 1;
+
+    body.setVelocity(vx * this.speed, vy * this.speed);
+
+    if (vx !== 0) {
+      this.sprite.setFlipX(vx < 0);
+    }
+
+    this.sprite.setDepth(this.sprite.y);
+
+    if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
+      this.performAttack();
+    }
+  }
+
+  performAttack() {
     if (this.isDead) return;
 
-    let inputX = 0;
-    let inputY = 0;
+    const now = this.scene.time.now;
+    if (now - this.lastAttack < this.attackCooldown) return;
+    this.lastAttack = now;
 
-    if (this.cursors.left.isDown || this.keys.A.isDown) inputX -= 1;
-    if (this.cursors.right.isDown || this.keys.D.isDown) inputX += 1;
-    if (this.cursors.up.isDown || this.keys.W.isDown) inputY -= 1;
-    if (this.cursors.down.isDown || this.keys.S.isDown) inputY += 1;
-
-    // === NEW: normalize diagonal input (no speed boost) ===
-    if (inputX !== 0 && inputY !== 0) {
-      inputX *= Math.SQRT1_2;
-      inputY *= Math.SQRT1_2;
-    }
-
-    const delta = this.scene.game.loop.delta / 1000;
-
-    const targetVX = inputX * this.MAX_SPEED;
-    const targetVY = inputY * this.MAX_SPEED;
-
-    // === NEW: smooth acceleration toward target velocity ===
-    this.velocityX = Phaser.Math.Linear(
-      this.velocityX,
-      targetVX,
-      this.ACCELERATION * delta
+    const enemy = this.enemyManager.getClosestEnemy(
+      this.sprite.x,
+      this.sprite.y,
+      this.attackRange
     );
 
-    this.velocityY = Phaser.Math.Linear(
-      this.velocityY,
-      targetVY,
-      this.ACCELERATION * delta
-    );
+    if (!enemy) return;
 
-    // === NEW: apply drag when no input ===
-    if (inputX === 0) {
-      this.velocityX = Phaser.Math.Linear(
-        this.velocityX,
-        0,
-        this.DRAG * delta
-      );
-    }
+    const ex = enemy.sprite.x;
+    const ey = enemy.sprite.y;
 
-    if (inputY === 0) {
-      this.velocityY = Phaser.Math.Linear(
-        this.velocityY,
-        0,
-        this.DRAG * delta
-      );
-    }
+    // Face target
+    this.sprite.setFlipX(ex < this.sprite.x);
 
-    // === ORIGINAL BEHAVIOR PRESERVED ===
-    this.sprite.setVelocity(this.velocityX, this.velocityY);
+    // === FORCE STRIKE VISUAL (TARGETED, SINGLE TARGET) ===
+    const gfx = this.scene.add.graphics();
+    gfx.setDepth(Math.max(this.sprite.y, ey) + 5);
 
-    // === NEW: update facing direction (non-breaking) ===
-    if (Math.abs(this.velocityX) > Math.abs(this.velocityY)) {
-      if (this.velocityX > 10) this.facing = "right";
-      else if (this.velocityX < -10) this.facing = "left";
-    } else {
-      if (this.velocityY > 10) this.facing = "down";
-      else if (this.velocityY < -10) this.facing = "up";
-    }
+    // Glow
+    gfx.lineStyle(6, 0xff8888, 0.35);
+    gfx.beginPath();
+    gfx.moveTo(this.sprite.x, this.sprite.y);
+    gfx.lineTo(ex, ey);
+    gfx.strokePath();
 
-    // === ORIGINAL ATTACK LOGIC (UNTOUCHED) ===
-    if (
-      this.scene.input.activePointer.isDown &&
-      time > this.lastAttack + this.attackCooldown
-    ) {
-      enemyManager.tryPlayerAttack(this.sprite.x, this.sprite.y);
-      this.lastAttack = time;
-    }
+    // Core
+    gfx.lineStyle(3, 0xff2222, 1);
+    gfx.beginPath();
+    gfx.moveTo(this.sprite.x, this.sprite.y);
+    gfx.lineTo(ex, ey);
+    gfx.strokePath();
+
+    this.scene.tweens.add({
+      targets: gfx,
+      alpha: 0,
+      duration: 120,
+      onComplete: () => gfx.destroy()
+    });
+
+    const dmg = Phaser.Math.Between(12, 18);
+    enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
   }
 
   takeDamage(amount: number) {
     if (this.isDead) return;
 
-    this.hp -= amount;
+    this.hp = Math.max(0, this.hp - amount);
 
+    // === DAMAGE NUMBER (VERY VISIBLE) ===
+    const txt = this.scene.add.text(
+      this.sprite.x,
+      this.sprite.y - 30,
+      `-${amount}`,
+      {
+        fontSize: "18px",
+        fontFamily: "monospace",
+        color: "#ff0000",
+        stroke: "#000000",
+        strokeThickness: 3
+      }
+    );
+
+    txt.setDepth(999);
+
+    this.scene.tweens.add({
+      targets: txt,
+      y: txt.y - 20,
+      alpha: 0,
+      duration: 600,
+      onComplete: () => txt.destroy()
+    });
+
+    // Hit flash
     this.scene.tweens.add({
       targets: this.sprite,
       alpha: 0.6,
