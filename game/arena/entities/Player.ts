@@ -170,4 +170,13 @@ private inputEnabled = true;
       (this.scene as any).onPlayerDeath?.();
     }
   }
+    // 🔑 called by ArenaScene when UI is shown
+  disableInput() {
+    this.inputEnabled = false;
+  }
+
+  // 🔑 called when a new run starts
+  enableInput() {
+    this.inputEnabled = true;
+  }
 }
