@@ -30,43 +30,50 @@ export default class ArenaScene extends Phaser.Scene {
   /* ===============================
      CREATE
   =============================== */
-  create(): void {
-    const { width, height } = this.scale;
+ create(): void {
+  // 🔑 SINGLE source of truth
+  const width = this.scale.gameSize.width;
+  const height = this.scale.gameSize.height;
 
-    // Background
-    this.add
-      .image(width / 2, height / 2, "arena-floor")
-      .setDisplaySize(width, height);
+  // Camera & physics bounds
+  this.cameras.main.setBounds(0, 0, width, height);
+  this.physics.world.setBounds(0, 0, width, height);
 
-    this.physics.world.setBounds(0, 0, width, height);
+  // Background
+  this.add
+    .image(width / 2, height / 2, "arena-floor")
+    .setDisplaySize(width, height);
 
-    // Systems
-    this.enemies = new EnemyManager(this);
+  // Systems
+  this.enemies = new EnemyManager(this);
 
-    this.player = new Player(
-      this,
-      width / 2,
-      height / 2,
-      this.enemies
-    );
+  // Player
+  this.player = new Player(
+    this,
+    width / 2,
+    height / 2,
+    this.enemies
+  );
 
-    this.hud = new HUD(this);
+  // HUD (screen-space)
+  this.hud = new HUD(this);
 
-    // Score hook
-    this.enemies.onEnemyKilled = (pts: number) => {
-      this.points += pts;
-    };
+  // Score hook
+  this.enemies.onEnemyKilled = (pts: number) => {
+    this.points += pts;
+  };
 
-    // Camera
-    this.cameras.main.startFollow(
-      this.player.sprite,
-      true,
-      0.08,
-      0.08
-    );
+  // Camera follow
+  this.cameras.main.startFollow(
+    this.player.sprite,
+    true,
+    0.08,
+    0.08
+  );
 
-    this.startWave(this.wave);
-  }
+  // Start game
+  this.startWave(this.wave);
+}
 
   /* ===============================
      UPDATE (HUD SAFE)
