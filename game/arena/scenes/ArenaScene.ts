@@ -261,6 +261,20 @@ export default class ArenaScene extends Phaser.Scene {
     nameInput.setScrollFactor(0);
     walletInput.setScrollFactor(0);
     // ====================================
+    const nameEl = nameInput.node as HTMLInputElement;
+    const walletEl = walletInput.node as HTMLInputElement;
+
+    nameEl.style.backgroundColor = "#ffffff";
+    nameEl.style.color = "#000000";
+    nameEl.style.border = "2px solid #00ff88";
+    nameEl.style.opacity = "1";
+    nameEl.style.visibility = "visible";
+
+    walletEl.style.backgroundColor = "#ffffff";
+    walletEl.style.color = "#000000";
+    walletEl.style.border = "2px solid #00ff88";
+    walletEl.style.opacity = "1";
+    walletEl.style.visibility = "visible";
 
     const confirmBtn = this.makeButton(
       cx,
