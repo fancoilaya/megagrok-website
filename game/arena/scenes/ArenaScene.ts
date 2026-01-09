@@ -236,7 +236,10 @@ export default class ArenaScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 3
     }).setOrigin(0.5);
-
+    
+this.add.dom(100, 100).createFromHTML(
+  '<div style="width:200px;height:50px;background:red;color:white;">DOM TEST</div>'
+);
   // ===== CORRECT PHASER DOM INPUTS =====
 const nameInput = this.add.dom(cx, cy - 70).createFromHTML(`
   <input
