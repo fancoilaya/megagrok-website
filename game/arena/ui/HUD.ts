@@ -12,7 +12,7 @@ export default class HUD {
 
     // HP
     this.hpText = scene.add
-      .text(16, 16, "HP: 0", {
+      .text(16, 96, "HP: 0", {
         fontFamily: "monospace",
         fontSize: "16px",
         color: "#ffffff",
@@ -24,7 +24,7 @@ export default class HUD {
 
     // Wave
     this.waveText = scene.add
-      .text(16, 36, "Wave: 1", {
+      .text(16, 116, "Wave: 1", {
         fontFamily: "monospace",
         fontSize: "16px",
         color: "#ffffff",
@@ -36,7 +36,7 @@ export default class HUD {
 
     // Score
     this.scoreText = scene.add
-      .text(16, 56, "Score: 0", {
+      .text(16, 136, "Score: 0", {
         fontFamily: "monospace",
         fontSize: "16px",
         color: "#ffffff",
