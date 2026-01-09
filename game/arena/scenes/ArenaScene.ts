@@ -294,6 +294,7 @@ walletInput.setScrollFactor(0);
       title,
       confirmBtn
     ]);
+    
     nameInput.setDepth(3000);
     walletInput.setDepth(3000);
 
