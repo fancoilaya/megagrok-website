@@ -236,61 +236,18 @@ export default class ArenaScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 3
     }).setOrigin(0.5);
-    
-this.add.dom(100, 100).createFromHTML(
-  '<div style="width:200px;height:50px;background:red;color:white;">DOM TEST</div>'
-);
-  // ===== CORRECT PHASER DOM INPUTS =====
-const nameInput = this.add.dom(cx, cy - 70).createFromHTML(`
-  <input
-    type="text"
-    placeholder="Name"
-    style="
-      width:260px;
-      padding:8px;
-      font-size:16px;
-      background:#ffffff;
-      color:#000000;
-      border:2px solid #00ff88;
-      outline:none;
-    "
-  />
-`);
 
-const walletInput = this.add.dom(cx, cy - 20).createFromHTML(`
-  <input
-    type="text"
-    placeholder="Wallet Address"
-    style="
-      width:260px;
-      padding:8px;
-      font-size:16px;
-      background:#ffffff;
-      color:#000000;
-      border:2px solid #00ff88;
-      outline:none;
-    "
-  />
-`);
+    const nameInput = this.add.dom(cx, cy - 70, "input", {
+      type: "text",
+      placeholder: "Name",
+      style: "width:260px;padding:6px;font-size:16px;"
+    });
 
-nameInput.setScrollFactor(0);
-walletInput.setScrollFactor(0);
-
-    // ====================================
-    const nameEl = nameInput.node as HTMLInputElement;
-    const walletEl = walletInput.node as HTMLInputElement;
-
-    nameEl.style.backgroundColor = "#ffffff";
-    nameEl.style.color = "#000000";
-    nameEl.style.border = "2px solid #00ff88";
-    nameEl.style.opacity = "1";
-    nameEl.style.visibility = "visible";
-
-    walletEl.style.backgroundColor = "#ffffff";
-    walletEl.style.color = "#000000";
-    walletEl.style.border = "2px solid #00ff88";
-    walletEl.style.opacity = "1";
-    walletEl.style.visibility = "visible";
+    const walletInput = this.add.dom(cx, cy - 20, "input", {
+      type: "text",
+      placeholder: "Wallet Address",
+      style: "width:260px;padding:6px;font-size:16px;"
+    });
 
     const confirmBtn = this.makeButton(
       cx,
