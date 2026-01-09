@@ -17,6 +17,8 @@ export default class Player {
   attackRange = 120;
 
   enemyManager: EnemyManager;
+  // 🔑 prevents movement + key polling when typing in DOM inputs
+private inputEnabled = true;
 
   constructor(
     scene: Phaser.Scene,
@@ -43,6 +45,10 @@ export default class Player {
   }
 
   update(_delta: number) {
+    if (!this.inputEnabled) {
+  this.sprite.setVelocity(0, 0);
+  return;
+}
     if (this.isDead) {
       this.sprite.setVelocity(0, 0);
       return;
