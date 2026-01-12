@@ -2,45 +2,46 @@ import EnemyManager from "../systems/EnemyManager";
 
 /**
  * A spawn function that knows how to spawn
- * one enemy at a position with a tier.
+ * one enemy at a position.
+ *
+ * Tier scaling is handled INSIDE EnemyManager.
  */
 export type EnemySpawnFn = (
   enemies: EnemyManager,
   x: number,
-  y: number,
-  tier: number
+  y: number
 ) => void;
 
 /**
  * Enemy pools per tier.
  *
- * IMPORTANT RULES:
+ * RULES:
  * - Exactly 5 tiers max
- * - Lower tiers are never used again once unlocked
- * - Only enemies that actually exist in-game are listed
- * - Scaling (HP / damage / speed) makes higher tiers dangerous
+ * - Lower tiers never return once unlocked
+ * - Only enemies that exist in-game are used
+ * - Difficulty scaling is handled in EnemyManager
  */
 export const ENEMY_TIERS: Record<number, EnemySpawnFn[]> = {
   /**
    * Tier 1 — Waves 1–5
-   * Intro enemies only
    */
   1: [
-    (e, x, y, t) => e.spawnHopGoblin(x, y, t),
-    (e, x, y, t) => e.spawnFudling(x, y, t),
-    (e, x, y, t) => e.spawnHopSlime(x, y, t),
-    (e, x, y, t) => e.spawnCroakling(x, y, t),
-    (e, x, y, t) => e.spawnRugRat(x, y, t)
+    (e, x, y) => e.spawnHopGoblin(x, y),
+    (e, x, y) => e.spawnFudling(x, y),
+    (e, x, y) => e.spawnHopSlime(x, y),
+    (e, x, y) => e.spawnCroakling(x, y),
+    (e, x, y) => e.spawnRugRat(x, y)
   ],
 
   /**
    * Tier 2 — Waves 6–10
-   * Same enemies, but noticeably stronger
    */
   2: [
-    (e, x, y, t) => e.spawnHopGoblin(x, y, t),
-    (e, x, y, t) => e.spawnFudling(x, y, t),
-    (e, x, y, t) => e.spawnHopSlime(x, y, t)
+    (e, x, y) => e.spawnHopGoblin(x, y),
+    (e, x, y) => e.spawnFudling(x, y),
+    (e, x, y) => e.spawnHopSlime(x, y),
+    (e, x, y) => e.spawnCroakling(x, y),
+    (e, x, y) => e.spawnRugRat(x, y)
   ],
 
   /**
@@ -48,16 +49,17 @@ export const ENEMY_TIERS: Record<number, EnemySpawnFn[]> = {
    * Weakest enemies start disappearing
    */
   3: [
-    (e, x, y, t) => e.spawnFudling(x, y, t),
-    (e, x, y, t) => e.spawnHopSlime(x, y, t)
+    (e, x, y) => e.spawnFudling(x, y),
+    (e, x, y) => e.spawnHopSlime(x, y),
+    (e, x, y) => e.spawnRugRat(x, y)
   ],
 
   /**
    * Tier 4 — Waves 16–20
-   * High-pressure enemies only
    */
   4: [
-    (e, x, y, t) => e.spawnHopSlime(x, y, t)
+    (e, x, y) => e.spawnHopSlime(x, y),
+    (e, x, y) => e.spawnRugRat(x, y)
   ],
 
   /**
@@ -65,6 +67,7 @@ export const ENEMY_TIERS: Record<number, EnemySpawnFn[]> = {
    * Endgame tier (scaling continues forever)
    */
   5: [
-    (e, x, y, t) => e.spawnHopSlime(x, y, t)
+    (e, x, y) => e.spawnHopSlime(x, y),
+    (e, x, y) => e.spawnRugRat(x, y)
   ]
 };
