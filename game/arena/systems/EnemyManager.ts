@@ -27,17 +27,19 @@ export default class EnemyManager {
     };
   }
 
-  private applyTierScaling(enemy: Enemy, tier: number) {
-    if (tier <= 1) return;
+private applyTierScaling(enemy: Enemy, tier: number) {
+  if (tier <= 1) return;
 
-    const mult = this.getStatMultiplier(tier);
+  enemy.maxHp = Math.floor(enemy.maxHp * (1 + tier * 0.35));
+  enemy.hp = enemy.maxHp;
 
-    enemy.maxHp = Math.floor(enemy.maxHp * mult.hp);
-    enemy.hp = enemy.maxHp;
+  // Melee enemies
+  enemy.contactDamage = Math.floor(
+    enemy.contactDamage * (1 + tier * 0.25)
+  );
 
-    enemy.damage = Math.floor(enemy.damage * mult.damage);
-    enemy.speed *= mult.speed;
-  }
+  enemy.speed *= 1 + tier * 0.05;
+}
 
   // =========================
   // SPAWN HELPERS
