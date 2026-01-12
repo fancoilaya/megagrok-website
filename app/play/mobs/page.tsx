@@ -11,7 +11,7 @@ export default function MobsPage() {
             "A small creature born from fear, uncertainty, and doubt. It feeds on weak charts and shaky hands.",
           strength: "Spreading panic",
           weakness: "Confidence",
-          image: "/game/enemies/tier_1/fudling.png"
+          image: "/game/enemies/tier_1/FUDling.png"
         },
         {
           name: "HopGoblin",
@@ -20,7 +20,7 @@ export default function MobsPage() {
             "A mischievous creature that channels raw hop-energy and causes trouble in liquidity pools.",
           strength: "Fast attacks",
           weakness: "Calmness",
-          image: "/game/enemies/tier_1/hopgoblin.png"
+          image: "/game/enemies/tier_1/HopGoblin.png"
         },
         {
           name: "Croakling",
@@ -29,7 +29,7 @@ export default function MobsPage() {
             "A tiny frog-gremlin found in noisy packs, overwhelming careless travelers.",
           strength: "Swarm tactics",
           weakness: "Area attacks",
-          image: "/game/enemies/tier_1/croakling.png"
+          image: "/game/enemies/tier_1/Croakling.png"
         },
         {
           name: "RugRat",
@@ -38,7 +38,7 @@ export default function MobsPage() {
             "A tiny creature that loves tangling rugs, wallets, and expectations.",
           strength: "Stealth",
           weakness: "Direct combat",
-          image: "/game/enemies/tier_1/rugrat.png"
+          image: "/game/enemies/tier_1/RugRat.png"
         },
         {
           name: "HopSlime",
@@ -47,7 +47,7 @@ export default function MobsPage() {
             "A sticky slime humming with unstable hop-energy.",
           strength: "Sticky slowdowns",
           weakness: "Fire / heat",
-          image: "/game/enemies/tier_1/hopslime.png"
+          image: "/game/enemies/tier_1/HopSlime.png"
         }
       ]
     },
