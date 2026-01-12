@@ -11,7 +11,7 @@ import RugRat from "../entities/RugRat";
  * All entities in /entities satisfy this at runtime.
  */
 type ArenaEnemy = {
-  sprite: Phaser.GameObjects.GameObject & { active: boolean };
+  sprite: Phaser.Physics.Arcade.Sprite;
   update(player: Phaser.Physics.Arcade.Sprite): void;
   maxHp: number;
   hp: number;
@@ -70,8 +70,8 @@ export default class EnemyManager {
     for (const enemy of this.enemies) {
       if (!enemy.sprite.active) continue;
 
-      const ex = (enemy.sprite as any).x;
-      const ey = (enemy.sprite as any).y;
+      const ex = enemy.sprite.x;
+      const ey = enemy.sprite.y;
 
       const dx = ex - x;
       const dy = ey - y;
