@@ -132,11 +132,57 @@ export default class ArenaScene extends Phaser.Scene {
     this.state = "between";
     this.showWaveText("Wave Complete!");
 
-    this.time.delayedCall(1000, () => {
-      if (this.state === "dead") return;
+const { width, height } = this.scale;
+
+const countdown = this.add.text(
+  width / 2,
+  height / 2,
+  "",
+  {
+    fontSize: "48px",
+    fontFamily: "monospace",
+    color: "#ffffff",
+    stroke: "#000000",
+    strokeThickness: 6
+  }
+)
+.setOrigin(0.5)
+.setDepth(1000)
+.setScrollFactor(0);
+
+const steps = ["3", "2", "1"];
+let index = 0;
+
+this.time.addEvent({
+  delay: 800,
+  repeat: steps.length - 1,
+  callback: () => {
+    if (this.state === "dead") {
+      countdown.destroy();
+      return;
+    }
+
+    countdown.setText(steps[index]);
+    countdown.setScale(1.4);
+    countdown.setAlpha(1);
+
+    this.tweens.add({
+      targets: countdown,
+      scale: 1,
+      alpha: 0.85,
+      duration: 250
+    });
+
+    index++;
+
+    if (index === steps.length) {
+      countdown.destroy();
       this.wave++;
       this.startWave(this.wave);
-    });
+    }
+  }
+});
+
   }
 
   showWaveText(text: string) {
