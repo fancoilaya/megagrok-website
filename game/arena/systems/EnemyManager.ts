@@ -7,10 +7,12 @@ import Croakling from "../entities/Croakling";
 import RugRat from "../entities/RugRat";
 
 /**
- * Enemies that support tier scaling.
- * Damage is optional (future-proof).
+ * Minimal runtime contract for arena enemies.
+ * All entities in /entities satisfy this at runtime.
  */
-type ScalableEnemy = Enemy & {
+type ArenaEnemy = {
+  sprite: Phaser.GameObjects.GameObject & { active: boolean };
+  update(player: Phaser.Physics.Arcade.Sprite): void;
   maxHp: number;
   hp: number;
   speed: number;
@@ -19,7 +21,7 @@ type ScalableEnemy = Enemy & {
 
 export default class EnemyManager {
   scene: Phaser.Scene;
-  enemies: Enemy[] = [];
+  enemies: ArenaEnemy[] = [];
   onEnemyKilled?: (points: number) => void;
 
   constructor(scene: Phaser.Scene) {
@@ -27,7 +29,7 @@ export default class EnemyManager {
   }
 
   // =========================
-  // SCALING (SAFE & TYPED)
+  // SCALING
   // =========================
 
   private getStatMultiplier(tier: number) {
@@ -38,23 +40,19 @@ export default class EnemyManager {
     };
   }
 
-  private applyTierScaling(enemy: Enemy, tier: number) {
+  private applyTierScaling(enemy: ArenaEnemy, tier: number) {
     if (!tier || tier <= 1) return;
 
-    const e = enemy as ScalableEnemy;
     const mult = this.getStatMultiplier(tier);
 
-    // HP scaling
-    e.maxHp = Math.floor(e.maxHp * mult.hp);
-    e.hp = e.maxHp;
+    enemy.maxHp = Math.floor(enemy.maxHp * mult.hp);
+    enemy.hp = enemy.maxHp;
 
-    // Damage scaling (only if enemy uses it)
-    if (typeof e.damage === "number") {
-      e.damage = Math.floor(e.damage * mult.damage);
+    if (typeof enemy.damage === "number") {
+      enemy.damage = Math.floor(enemy.damage * mult.damage);
     }
 
-    // Speed scaling
-    e.speed *= mult.speed;
+    enemy.speed *= mult.speed;
   }
 
   // =========================
@@ -88,30 +86,28 @@ export default class EnemyManager {
     this.enemies.push(e);
   }
 
-  // === NEW ENEMIES ===
-
   spawnCroakling(x: number, y: number, tier: number = 1) {
     const e = new Croakling(this.scene, x, y);
 
-    this.applyTierScaling(e as Enemy, tier);
+    this.applyTierScaling(e, tier);
 
     e.onDeath = () => {
       if (this.onEnemyKilled) this.onEnemyKilled(5);
     };
 
-    this.enemies.push(e as Enemy);
+    this.enemies.push(e);
   }
 
   spawnRugRat(x: number, y: number, tier: number = 1) {
     const e = new RugRat(this.scene, x, y);
 
-    this.applyTierScaling(e as Enemy, tier);
+    this.applyTierScaling(e, tier);
 
     e.onDeath = () => {
       if (this.onEnemyKilled) this.onEnemyKilled(8);
     };
 
-    this.enemies.push(e as Enemy);
+    this.enemies.push(e);
   }
 
   // =========================
@@ -119,43 +115,13 @@ export default class EnemyManager {
   // =========================
 
   update(playerSprite: Phaser.Physics.Arcade.Sprite) {
-    // Remove dead enemies from list
     this.enemies = this.enemies.filter(e => e.sprite.active);
 
-    // Prevent stacking
     this.applySeparation();
 
     for (const enemy of this.enemies) {
       enemy.update(playerSprite);
     }
-  }
-
-  // =========================
-  // TARGETING
-  // =========================
-
-  getClosestEnemy(
-    x: number,
-    y: number,
-    maxDistance: number
-  ): Enemy | null {
-    let closest: Enemy | null = null;
-    let closestDist = maxDistance;
-
-    for (const enemy of this.enemies) {
-      if (!enemy.sprite.active) continue;
-
-      const dx = enemy.sprite.x - x;
-      const dy = enemy.sprite.y - y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < closestDist) {
-        closestDist = dist;
-        closest = enemy;
-      }
-    }
-
-    return closest;
   }
 
   // =========================
@@ -167,8 +133,8 @@ export default class EnemyManager {
 
     for (let i = 0; i < this.enemies.length; i++) {
       for (let j = i + 1; j < this.enemies.length; j++) {
-        const a = this.enemies[i].sprite;
-        const b = this.enemies[j].sprite;
+        const a = this.enemies[i].sprite as any;
+        const b = this.enemies[j].sprite as any;
 
         if (!a.active || !b.active) continue;
 
@@ -197,8 +163,6 @@ export default class EnemyManager {
   clearAll() {
     for (const enemy of this.enemies) {
       enemy.sprite.destroy();
-      enemy.hpBar.destroy();
-      enemy.hpBarBg.destroy();
     }
     this.enemies = [];
   }
