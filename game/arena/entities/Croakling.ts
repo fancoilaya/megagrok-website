@@ -3,8 +3,12 @@ import Enemy from "./Enemy";
 
 export default class Croakling extends Enemy {
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "croakling");
+    super(scene, x, y);
 
+    // Texture
+    this.sprite.setTexture("croakling");
+
+    // Stats
     this.maxHp = 14;
     this.hp = this.maxHp;
     this.damage = 4;
