@@ -79,14 +79,13 @@ private applyTierScaling(enemy: Enemy, tier: number) {
   this.enemies.push(e);
 }
 
-  spawnRugRat(x: number, y: number, tier: number = 1) {
-    const e = new RugRat(this.scene, x, y, pts => {
-      this.onEnemyKilled?.(pts);
-    });
+spawnRugRat(x: number, y: number, tier: number = 1) {
+  const e = new RugRat(this.scene, x, y);
 
-    this.applyTierScaling(e, tier);
-    this.enemies.push(e);
-  }
+  this.applyTierScaling(e, tier);
+  this.enemies.push(e);
+}
+
 
   // =========================
   // UPDATE LOOP
