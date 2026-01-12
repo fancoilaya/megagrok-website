@@ -55,6 +55,38 @@ export default class EnemyManager {
     enemy.speed *= mult.speed;
   }
 
+    // =========================
+  // TARGETING
+  // =========================
+
+  getClosestEnemy(
+    x: number,
+    y: number,
+    maxDistance: number
+  ): ArenaEnemy | null {
+    let closest: ArenaEnemy | null = null;
+    let closestDist = maxDistance;
+
+    for (const enemy of this.enemies) {
+      if (!enemy.sprite.active) continue;
+
+      const ex = (enemy.sprite as any).x;
+      const ey = (enemy.sprite as any).y;
+
+      const dx = ex - x;
+      const dy = ey - y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = enemy;
+      }
+    }
+
+    return closest;
+  }
+
+
   // =========================
   // SPAWN HELPERS
   // =========================
