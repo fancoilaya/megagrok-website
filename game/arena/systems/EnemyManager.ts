@@ -17,6 +17,12 @@ type ArenaEnemy = {
   hp: number;
   speed: number;
   damage?: number;
+
+  takeDamage(
+    amount: number,
+    fromX?: number,
+    fromY?: number
+  ): void;
 };
 
 export default class EnemyManager {
