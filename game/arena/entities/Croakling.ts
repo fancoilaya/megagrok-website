@@ -2,13 +2,8 @@ import * as Phaser from "phaser";
 import Enemy from "./Enemy";
 
 export default class Croakling extends Enemy {
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    onKilled?: (points: number) => void
-  ) {
-    super(scene, x, y, "croakling", onKilled);
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x, y, "croakling");
 
     this.maxHp = 14;
     this.hp = this.maxHp;
