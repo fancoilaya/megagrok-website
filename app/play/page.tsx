@@ -85,8 +85,21 @@ export default function PlayPage() {
           >
             → View RPG Systems & Mechanics
           </a>
+          <a  
+            href="/play/mobs"
+            style={{
+              marginTop: 10,
+              display: "inline-block",
+              fontWeight: 800,
+              color: "#ff7a00"
+            }}
+          >
+            → Explore the Grokdex (Mobs & Tiers)
+          </a>
         </div>
       </section>
+      
+      
 
       {/* CTA */}
       <section style={{ marginTop: 64 }}>
