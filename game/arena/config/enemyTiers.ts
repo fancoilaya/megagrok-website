@@ -28,7 +28,9 @@ export const ENEMY_TIERS: Record<number, EnemySpawnFn[]> = {
   1: [
     (e, x, y, t) => e.spawnHopGoblin(x, y, t),
     (e, x, y, t) => e.spawnFudling(x, y, t),
-    (e, x, y, t) => e.spawnHopSlime(x, y, t)
+    (e, x, y, t) => e.spawnHopSlime(x, y, t),
+    (e, x, y, t) => e.spawnCroakling(x, y, t),
+    (e, x, y, t) => e.spawnRugRat(x, y, t)
   ],
 
   /**
