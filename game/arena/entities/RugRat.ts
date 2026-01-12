@@ -14,9 +14,7 @@ export default class RugRat extends Enemy {
     this.defense = 1;
     this.contactDamage = 6;
     this.killPoints = 8;
-    this.attackCooldown = 600;
 
     this.sprite.setScale(1);
   }
 }
-
