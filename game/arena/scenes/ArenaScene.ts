@@ -30,56 +30,56 @@ export default class ArenaScene extends Phaser.Scene {
   /* ===============================
      CREATE
   =============================== */
- create(): void {
-  // 🔑 SINGLE source of truth
-  const width = this.scale.gameSize.width;
-  const height = this.scale.gameSize.height;
+  create(): void {
+    // 🔑 SINGLE source of truth
+    const width = this.scale.gameSize.width;
+    const height = this.scale.gameSize.height;
 
-   this.input.keyboard?.clearCaptures();
+    this.input.keyboard?.clearCaptures();
 
-  // Camera & physics bounds
-  this.cameras.main.setBounds(0, 0, width, height);
-  this.physics.world.setBounds(0, 0, width, height);
+    // Camera & physics bounds
+    this.cameras.main.setBounds(0, 0, width, height);
+    this.physics.world.setBounds(0, 0, width, height);
 
-   // Releases WASD back to the browser
-   this.input.keyboard?.clearCaptures();
-   
-  // Background
-  this.add
-    .image(width / 2, height / 2, "arena-floor")
-    .setDisplaySize(width, height);
+    // Releases WASD back to the browser
+    this.input.keyboard?.clearCaptures();
 
-  // Systems
-  this.enemies = new EnemyManager(this);
+    // Background
+    this.add
+      .image(width / 2, height / 2, "arena-floor")
+      .setDisplaySize(width, height);
 
-  // Player
-  this.player = new Player(
-    this,
-    width / 2,
-    height / 2,
-    this.enemies
-  );
+    // Systems
+    this.enemies = new EnemyManager(this);
 
-  // HUD (screen-space)
-  this.hud = new HUD(this);
-   console.log("HUD CREATED");
+    // Player
+    this.player = new Player(
+      this,
+      width / 2,
+      height / 2,
+      this.enemies
+    );
 
-  // Score hook
-  this.enemies.onEnemyKilled = (pts: number) => {
-    this.points += pts;
-  };
+    // HUD (screen-space)
+    this.hud = new HUD(this);
+    console.log("HUD CREATED");
 
-  // Camera follow
-  this.cameras.main.startFollow(
-    this.player.sprite,
-    true,
-    0.08,
-    0.08
-  );
+    // Score hook
+    this.enemies.onEnemyKilled = (pts: number) => {
+      this.points += pts;
+    };
 
-  // Start game
-  this.startWave(this.wave);
-}
+    // Camera follow
+    this.cameras.main.startFollow(
+      this.player.sprite,
+      true,
+      0.08,
+      0.08
+    );
+
+    // Start game
+    this.startWave(this.wave);
+  }
 
   /* ===============================
      UPDATE (HUD SAFE)
@@ -132,57 +132,64 @@ export default class ArenaScene extends Phaser.Scene {
     this.state = "between";
     this.showWaveText("Wave Complete!");
 
-const { width, height } = this.scale;
+    const { width, height } = this.scale;
 
-const countdown = this.add.text(
-  width / 2,
-  height / 2,
-  "",
-  {
-    fontSize: "48px",
-    fontFamily: "monospace",
-    color: "#ffffff",
-    stroke: "#000000",
-    strokeThickness: 6
-  }
-)
-.setOrigin(0.5)
-.setDepth(1000)
-.setScrollFactor(0);
+    // === NEW LOGIC (SAFE): determine if next wave is a boss ===
+    const nextWave = this.wave + 1;
+    const bossIncoming = nextWave % 5 === 0;
 
-const steps = ["3", "2", "1"];
-let index = 0;
+    const countdown = this.add.text(
+      width / 2,
+      height / 2,
+      "",
+      {
+        fontSize: bossIncoming ? "56px" : "48px",
+        fontFamily: "monospace",
+        color: bossIncoming ? "#ff2222" : "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 6
+      }
+    )
+      .setOrigin(0.5)
+      .setDepth(1000)
+      .setScrollFactor(0);
 
-this.time.addEvent({
-  delay: 800,
-  repeat: steps.length - 1,
-  callback: () => {
-    if (this.state === "dead") {
-      countdown.destroy();
-      return;
-    }
+    // === CHANGED: steps depend on boss wave ===
+    const steps = bossIncoming
+      ? ["BOSS", "INCOMING"]
+      : ["3", "2", "1"];
 
-    countdown.setText(steps[index]);
-    countdown.setScale(1.4);
-    countdown.setAlpha(1);
+    let index = 0;
 
-    this.tweens.add({
-      targets: countdown,
-      scale: 1,
-      alpha: 0.85,
-      duration: 250
+    this.time.addEvent({
+      delay: 800,
+      repeat: steps.length - 1,
+      callback: () => {
+        if (this.state === "dead") {
+          countdown.destroy();
+          return;
+        }
+
+        countdown.setText(steps[index]);
+        countdown.setScale(1.4);
+        countdown.setAlpha(1);
+
+        this.tweens.add({
+          targets: countdown,
+          scale: 1,
+          alpha: 0.85,
+          duration: 250
+        });
+
+        index++;
+
+        if (index === steps.length) {
+          countdown.destroy();
+          this.wave++;
+          this.startWave(this.wave);
+        }
+      }
     });
-
-    index++;
-
-    if (index === steps.length) {
-      countdown.destroy();
-      this.wave++;
-      this.startWave(this.wave);
-    }
-  }
-});
-
   }
 
   showWaveText(text: string) {
@@ -215,32 +222,33 @@ this.time.addEvent({
   /* ===============================
      GAME OVER
   =============================== */
-onPlayerDeath() {
-  if (this.state === "dead") return;
+  onPlayerDeath() {
+    if (this.state === "dead") return;
 
-  this.state = "dead";
+    this.state = "dead";
 
-  this.player.disableInput();
-  this.player.destroyKeys();
-  // Stop gameplay safely
-  this.enemies.clearAll();
-  this.player.sprite.setVelocity(0, 0);
-  
-   // 🔑 Disable Phaser keyboard so DOM inputs work
-  if (this.input.keyboard) {
-  this.input.keyboard.enabled = false;
-}
+    this.player.disableInput();
+    this.player.destroyKeys();
 
-  // Emit run result to React
-  window.dispatchEvent(
-    new CustomEvent("arena:submit-score", {
-      detail: {
-        score: this.points,
-        wave: this.wave - 1
-      }
-    })
-  );
-}
+    // Stop gameplay safely
+    this.enemies.clearAll();
+    this.player.sprite.setVelocity(0, 0);
+
+    // 🔑 Disable Phaser keyboard so DOM inputs work
+    if (this.input.keyboard) {
+      this.input.keyboard.enabled = false;
+    }
+
+    // Emit run result to React
+    window.dispatchEvent(
+      new CustomEvent("arena:submit-score", {
+        detail: {
+          score: this.points,
+          wave: this.wave - 1
+        }
+      })
+    );
+  }
 
   /* ===============================
      BUTTON
