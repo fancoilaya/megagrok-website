@@ -6,28 +6,9 @@ import Fudling from "../entities/Fudling";
 import Croakling from "../entities/Croakling";
 import RugRat from "../entities/RugRat";
 
-/**
- * Minimal runtime contract for arena enemies.
- * All entities in /entities satisfy this at runtime.
- */
-type ArenaEnemy = {
-  sprite: Phaser.Physics.Arcade.Sprite;
-  update(player: Phaser.Physics.Arcade.Sprite): void;
-  maxHp: number;
-  hp: number;
-  speed: number;
-  damage?: number;
-
-  takeDamage(
-    amount: number,
-    fromX?: number,
-    fromY?: number
-  ): void;
-};
-
 export default class EnemyManager {
   scene: Phaser.Scene;
-  enemies: ArenaEnemy[] = [];
+  enemies: Enemy[] = [];
   onEnemyKilled?: (points: number) => void;
 
   constructor(scene: Phaser.Scene) {
@@ -46,22 +27,84 @@ export default class EnemyManager {
     };
   }
 
-  private applyTierScaling(enemy: ArenaEnemy, tier: number) {
-    if (!tier || tier <= 1) return;
+  private applyTierScaling(enemy: Enemy, tier: number) {
+    if (tier <= 1) return;
 
     const mult = this.getStatMultiplier(tier);
 
     enemy.maxHp = Math.floor(enemy.maxHp * mult.hp);
     enemy.hp = enemy.maxHp;
 
-    if (typeof enemy.damage === "number") {
-      enemy.damage = Math.floor(enemy.damage * mult.damage);
-    }
-
+    enemy.damage = Math.floor(enemy.damage * mult.damage);
     enemy.speed *= mult.speed;
   }
 
-    // =========================
+  // =========================
+  // SPAWN HELPERS
+  // =========================
+
+  spawnHopGoblin(x: number, y: number, tier: number = 1) {
+    const e = new HopGoblin(this.scene, x, y, pts => {
+      this.onEnemyKilled?.(pts);
+    });
+
+    this.applyTierScaling(e, tier);
+    this.enemies.push(e);
+  }
+
+  spawnHopSlime(x: number, y: number, tier: number = 1) {
+    const e = new HopSlime(this.scene, x, y, pts => {
+      this.onEnemyKilled?.(pts);
+    });
+
+    this.applyTierScaling(e, tier);
+    this.enemies.push(e);
+  }
+
+  spawnFudling(x: number, y: number, tier: number = 1) {
+    const e = new Fudling(this.scene, x, y, pts => {
+      this.onEnemyKilled?.(pts);
+    });
+
+    this.applyTierScaling(e, tier);
+    this.enemies.push(e);
+  }
+
+  spawnCroakling(x: number, y: number, tier: number = 1) {
+    const e = new Croakling(this.scene, x, y, pts => {
+      this.onEnemyKilled?.(pts);
+    });
+
+    this.applyTierScaling(e, tier);
+    this.enemies.push(e);
+  }
+
+  spawnRugRat(x: number, y: number, tier: number = 1) {
+    const e = new RugRat(this.scene, x, y, pts => {
+      this.onEnemyKilled?.(pts);
+    });
+
+    this.applyTierScaling(e, tier);
+    this.enemies.push(e);
+  }
+
+  // =========================
+  // UPDATE LOOP
+  // =========================
+
+  update(playerSprite: Phaser.Physics.Arcade.Sprite) {
+    // Remove dead enemies
+    this.enemies = this.enemies.filter(e => e.sprite.active);
+
+    // Prevent stacking
+    this.applySeparation();
+
+    for (const enemy of this.enemies) {
+      enemy.update(playerSprite);
+    }
+  }
+
+  // =========================
   // TARGETING
   // =========================
 
@@ -69,18 +112,15 @@ export default class EnemyManager {
     x: number,
     y: number,
     maxDistance: number
-  ): ArenaEnemy | null {
-    let closest: ArenaEnemy | null = null;
+  ): Enemy | null {
+    let closest: Enemy | null = null;
     let closestDist = maxDistance;
 
     for (const enemy of this.enemies) {
       if (!enemy.sprite.active) continue;
 
-      const ex = enemy.sprite.x;
-      const ey = enemy.sprite.y;
-
-      const dx = ex - x;
-      const dy = ey - y;
+      const dx = enemy.sprite.x - x;
+      const dy = enemy.sprite.y - y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < closestDist) {
@@ -92,76 +132,6 @@ export default class EnemyManager {
     return closest;
   }
 
-
-  // =========================
-  // SPAWN HELPERS
-  // =========================
-
-  spawnHopGoblin(x: number, y: number, tier: number = 1) {
-    const e = new HopGoblin(this.scene, x, y, pts => {
-      if (this.onEnemyKilled) this.onEnemyKilled(pts);
-    });
-
-    this.applyTierScaling(e, tier);
-    this.enemies.push(e);
-  }
-
-  spawnHopSlime(x: number, y: number, tier: number = 1) {
-    const e = new HopSlime(this.scene, x, y, pts => {
-      if (this.onEnemyKilled) this.onEnemyKilled(pts);
-    });
-
-    this.applyTierScaling(e, tier);
-    this.enemies.push(e);
-  }
-
-  spawnFudling(x: number, y: number, tier: number = 1) {
-    const e = new Fudling(this.scene, x, y, pts => {
-      if (this.onEnemyKilled) this.onEnemyKilled(pts);
-    });
-
-    this.applyTierScaling(e, tier);
-    this.enemies.push(e);
-  }
-
-  spawnCroakling(x: number, y: number, tier: number = 1) {
-    const e = new Croakling(this.scene, x, y);
-
-    this.applyTierScaling(e, tier);
-
-    e.onDeath = () => {
-      if (this.onEnemyKilled) this.onEnemyKilled(5);
-    };
-
-    this.enemies.push(e);
-  }
-
-  spawnRugRat(x: number, y: number, tier: number = 1) {
-    const e = new RugRat(this.scene, x, y);
-
-    this.applyTierScaling(e, tier);
-
-    e.onDeath = () => {
-      if (this.onEnemyKilled) this.onEnemyKilled(8);
-    };
-
-    this.enemies.push(e);
-  }
-
-  // =========================
-  // UPDATE LOOP
-  // =========================
-
-  update(playerSprite: Phaser.Physics.Arcade.Sprite) {
-    this.enemies = this.enemies.filter(e => e.sprite.active);
-
-    this.applySeparation();
-
-    for (const enemy of this.enemies) {
-      enemy.update(playerSprite);
-    }
-  }
-
   // =========================
   // SEPARATION (ANTI-STACK)
   // =========================
@@ -171,8 +141,8 @@ export default class EnemyManager {
 
     for (let i = 0; i < this.enemies.length; i++) {
       for (let j = i + 1; j < this.enemies.length; j++) {
-        const a = this.enemies[i].sprite as any;
-        const b = this.enemies[j].sprite as any;
+        const a = this.enemies[i].sprite;
+        const b = this.enemies[j].sprite;
 
         if (!a.active || !b.active) continue;
 
@@ -195,12 +165,14 @@ export default class EnemyManager {
   }
 
   // =========================
-  // CLEANUP (BETWEEN WAVES / RESET)
+  // CLEANUP
   // =========================
 
   clearAll() {
     for (const enemy of this.enemies) {
       enemy.sprite.destroy();
+      enemy.hpBar.destroy();
+      enemy.hpBarBg.destroy();
     }
     this.enemies = [];
   }
