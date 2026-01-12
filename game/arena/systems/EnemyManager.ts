@@ -16,28 +16,84 @@ export default class EnemyManager {
   }
 
   // =========================
+  // SCALING (NEW – SAFE)
+  // =========================
+
+  private getStatMultiplier(tier: number) {
+    return {
+      hp: 1 + tier * 0.35,
+      damage: 1 + tier * 0.25,
+      speed: 1 + tier * 0.05
+    };
+  }
+
+  private applyTierScaling(enemy: Enemy, tier: number) {
+    if (!tier || tier <= 1) return;
+
+    const mult = this.getStatMultiplier(tier);
+
+    enemy.maxHp = Math.floor(enemy.maxHp * mult.hp);
+    enemy.hp = enemy.maxHp;
+
+    enemy.damage = Math.floor(enemy.damage * mult.damage);
+    enemy.speed *= mult.speed;
+  }
+
+  // =========================
   // SPAWN HELPERS
   // =========================
 
-  spawnHopGoblin(x: number, y: number) {
+  spawnHopGoblin(x: number, y: number, tier: number = 1) {
     const e = new HopGoblin(this.scene, x, y, pts => {
       if (this.onEnemyKilled) this.onEnemyKilled(pts);
     });
+
+    this.applyTierScaling(e, tier);
     this.enemies.push(e);
   }
 
-  spawnHopSlime(x: number, y: number) {
+  spawnHopSlime(x: number, y: number, tier: number = 1) {
     const e = new HopSlime(this.scene, x, y, pts => {
       if (this.onEnemyKilled) this.onEnemyKilled(pts);
     });
+
+    this.applyTierScaling(e, tier);
     this.enemies.push(e);
   }
 
-  spawnFudling(x: number, y: number) {
+  spawnFudling(x: number, y: number, tier: number = 1) {
     const e = new Fudling(this.scene, x, y, pts => {
       if (this.onEnemyKilled) this.onEnemyKilled(pts);
     });
+
+    this.applyTierScaling(e, tier);
     this.enemies.push(e);
+  }
+
+  // === NEW ENEMIES (ADDED, NO REMOVALS) ===
+
+  spawnCroakling(x: number, y: number, tier: number = 1) {
+    const e = new Croakling(this.scene, x, y);
+
+    this.applyTierScaling(e as unknown as Enemy, tier);
+
+    e.onDeath = () => {
+      if (this.onEnemyKilled) this.onEnemyKilled(5);
+    };
+
+    this.enemies.push(e as unknown as Enemy);
+  }
+
+  spawnRugRat(x: number, y: number, tier: number = 1) {
+    const e = new RugRat(this.scene, x, y);
+
+    this.applyTierScaling(e as unknown as Enemy, tier);
+
+    e.onDeath = () => {
+      if (this.onEnemyKilled) this.onEnemyKilled(8);
+    };
+
+    this.enemies.push(e as unknown as Enemy);
   }
 
   // =========================
