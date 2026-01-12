@@ -6,6 +6,17 @@ import Fudling from "../entities/Fudling";
 import Croakling from "../entities/Croakling";
 import RugRat from "../entities/RugRat";
 
+/**
+ * Enemies that support tier scaling.
+ * Damage is optional (future-proof).
+ */
+type ScalableEnemy = Enemy & {
+  maxHp: number;
+  hp: number;
+  speed: number;
+  damage?: number;
+};
+
 export default class EnemyManager {
   scene: Phaser.Scene;
   enemies: Enemy[] = [];
@@ -16,7 +27,7 @@ export default class EnemyManager {
   }
 
   // =========================
-  // SCALING (NEW – SAFE)
+  // SCALING (SAFE & TYPED)
   // =========================
 
   private getStatMultiplier(tier: number) {
@@ -30,13 +41,20 @@ export default class EnemyManager {
   private applyTierScaling(enemy: Enemy, tier: number) {
     if (!tier || tier <= 1) return;
 
+    const e = enemy as ScalableEnemy;
     const mult = this.getStatMultiplier(tier);
 
-    enemy.maxHp = Math.floor(enemy.maxHp * mult.hp);
-    enemy.hp = enemy.maxHp;
+    // HP scaling
+    e.maxHp = Math.floor(e.maxHp * mult.hp);
+    e.hp = e.maxHp;
 
-    enemy.damage = Math.floor(enemy.damage * mult.damage);
-    enemy.speed *= mult.speed;
+    // Damage scaling (only if enemy uses it)
+    if (typeof e.damage === "number") {
+      e.damage = Math.floor(e.damage * mult.damage);
+    }
+
+    // Speed scaling
+    e.speed *= mult.speed;
   }
 
   // =========================
@@ -70,30 +88,30 @@ export default class EnemyManager {
     this.enemies.push(e);
   }
 
-  // === NEW ENEMIES (ADDED, NO REMOVALS) ===
+  // === NEW ENEMIES ===
 
   spawnCroakling(x: number, y: number, tier: number = 1) {
     const e = new Croakling(this.scene, x, y);
 
-    this.applyTierScaling(e as unknown as Enemy, tier);
+    this.applyTierScaling(e as Enemy, tier);
 
     e.onDeath = () => {
       if (this.onEnemyKilled) this.onEnemyKilled(5);
     };
 
-    this.enemies.push(e as unknown as Enemy);
+    this.enemies.push(e as Enemy);
   }
 
   spawnRugRat(x: number, y: number, tier: number = 1) {
     const e = new RugRat(this.scene, x, y);
 
-    this.applyTierScaling(e as unknown as Enemy, tier);
+    this.applyTierScaling(e as Enemy, tier);
 
     e.onDeath = () => {
       if (this.onEnemyKilled) this.onEnemyKilled(8);
     };
 
-    this.enemies.push(e as unknown as Enemy);
+    this.enemies.push(e as Enemy);
   }
 
   // =========================
