@@ -3,8 +3,8 @@ import Enemy from "../entities/Enemy";
 import HopGoblin from "../entities/HopGoblin";
 import HopSlime from "../entities/HopSlime";
 import Fudling from "../entities/Fudling";
-import Croakling from "../enemies/Croakling";
-import RugRat from "../enemies/RugRat";
+import Croakling from "../entities/Croakling";
+import RugRat from "../entities/RugRat";
 
 export default class EnemyManager {
   scene: Phaser.Scene;
