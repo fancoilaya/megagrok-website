@@ -8,22 +8,16 @@ export default class Croakling extends Enemy {
     y: number,
     onKilled?: (points: number) => void
   ) {
-    super(
-      scene,
-      x,
-      y,
-      "croakling",
-      {
-        maxHp: 14,
-        damage: 4,
-        speed: 150,
-        defense: 0,
-        attackCooldown: 700,
-        contactDamage: 4,
-        killPoints: 5
-      },
-      onKilled
-    );
+    super(scene, x, y, "croakling", onKilled);
+
+    this.maxHp = 14;
+    this.hp = this.maxHp;
+    this.damage = 4;
+    this.speed = 150;
+    this.defense = 0;
+    this.contactDamage = 4;
+    this.killPoints = 5;
+    this.attackCooldown = 700;
 
     this.sprite.setScale(0.9);
   }
