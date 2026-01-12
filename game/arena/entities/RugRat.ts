@@ -8,22 +8,16 @@ export default class RugRat extends Enemy {
     y: number,
     onKilled?: (points: number) => void
   ) {
-    super(
-      scene,
-      x,
-      y,
-      "rugrat",
-      {
-        maxHp: 22,
-        damage: 6,
-        speed: 180,
-        defense: 1,
-        attackCooldown: 600,
-        contactDamage: 6,
-        killPoints: 8
-      },
-      onKilled
-    );
+    super(scene, x, y, "rugrat", onKilled);
+
+    this.maxHp = 22;
+    this.hp = this.maxHp;
+    this.damage = 6;
+    this.speed = 180;
+    this.defense = 1;
+    this.contactDamage = 6;
+    this.killPoints = 8;
+    this.attackCooldown = 600;
 
     this.sprite.setScale(1);
   }
