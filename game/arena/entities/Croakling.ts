@@ -14,7 +14,6 @@ export default class Croakling extends Enemy {
     this.defense = 0;
     this.contactDamage = 4;
     this.killPoints = 5;
-    this.attackCooldown = 700;
 
     this.sprite.setScale(0.9);
   }
