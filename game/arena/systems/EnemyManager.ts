@@ -84,6 +84,8 @@ spawnRugRat(x: number, y: number, tier: number = 1) {
 
   this.applyTierScaling(e, tier);
   this.enemies.push(e);
+  
+  return e;
 }
 
 
