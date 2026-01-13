@@ -12,6 +12,9 @@ export default class BootScene extends Phaser.Scene {
     this.load.image("hopgoblin", "/game/enemies/hopgoblin.png");
     this.load.image("hopslime", "/game/enemies/hopslime.png");
     this.load.image("fudling", "/game/enemies/fudling.png");
+    this.load.image("croakling", "/game/enemies/croakling.png");
+    this.load.image("rugrat", "/game/enemies/rugrat.png");
+
 
   }
 
