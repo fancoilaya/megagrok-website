@@ -124,6 +124,7 @@ private inputEnabled = true;
     });
 
     const dmg = Phaser.Math.Between(12, 18);
+    this.playSlashArc(enemy.sprite.x, enemy.sprite.y);
     enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
   }
 
@@ -199,4 +200,35 @@ private inputEnabled = true;
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
   }
+
+  // VISUAL ONLY — does NOT affect gameplay
+private playSlashArc(targetX: number, targetY: number) {
+  const gfx = this.scene.add.graphics();
+  gfx.setDepth(900);
+
+  const px = this.sprite.x;
+  const py = this.sprite.y;
+
+  const angle = Phaser.Math.Angle.Between(px, py, targetX, targetY);
+
+  gfx.lineStyle(6, 0xffffff, 0.9);
+  gfx.beginPath();
+  gfx.arc(
+    px,
+    py,
+    40,
+    angle - Math.PI / 4,
+    angle + Math.PI / 4
+  );
+  gfx.strokePath();
+
+  this.scene.tweens.add({
+    targets: gfx,
+    alpha: 0,
+    scale: 1.2,
+    duration: 120,
+    onComplete: () => gfx.destroy()
+  });
+}
+
 }
