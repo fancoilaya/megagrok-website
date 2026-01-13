@@ -49,6 +49,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ROADMAP */}
+<section style={{ marginTop: 64 }}>
+  <h2 className="section-title">Roadmap</h2>
+
+  <a href="/roadmap" className="panel">
+    <h3>MegaGrok Roadmap</h3>
+    <p>
+      Explore the planned evolution of the MegaGrok universe —
+      from core RPG systems to Arena expansion, lore, and ecosystem growth.
+    </p>
+
+    <p style={{ marginTop: 10, fontWeight: 700, color: "#ff7a00" }}>
+      → View the Roadmap
+    </p>
+  </a>
+</section>
+
       {/* TOKENOMICS PLACEHOLDER */}
       <section style={{ marginTop: 64 }}>
         <h2 className="section-title">Tokenomics</h2>
