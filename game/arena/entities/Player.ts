@@ -98,32 +98,10 @@ private inputEnabled = true;
     // Face target
     this.sprite.setFlipX(ex < this.sprite.x);
 
-    // === FORCE STRIKE VISUAL (TARGETED, SINGLE TARGET) ===
-    const gfx = this.scene.add.graphics();
-    gfx.setDepth(Math.max(this.sprite.y, ey) + 5);
 
-    // Glow
-    gfx.lineStyle(6, 0xff8888, 0.35);
-    gfx.beginPath();
-    gfx.moveTo(this.sprite.x, this.sprite.y);
-    gfx.lineTo(ex, ey);
-    gfx.strokePath();
-
-    // Core
-    gfx.lineStyle(3, 0xff2222, 1);
-    gfx.beginPath();
-    gfx.moveTo(this.sprite.x, this.sprite.y);
-    gfx.lineTo(ex, ey);
-    gfx.strokePath();
-
-    this.scene.tweens.add({
-      targets: gfx,
-      alpha: 0,
-      duration: 120,
-      onComplete: () => gfx.destroy()
-    });
 
     const dmg = Phaser.Math.Between(12, 18);
+    this.playSlashArc(enemy.sprite.x, enemy.sprite.y);
     enemy.takeDamage(dmg, this.sprite.x, this.sprite.y);
   }
 
@@ -164,12 +142,49 @@ private inputEnabled = true;
       yoyo: true
     });
 
+
+    
     // === DEATH (IMMEDIATE) ===
     if (this.hp <= 0) {
       this.isDead = true;
       (this.scene as any).onPlayerDeath?.();
     }
   }
+
+// VISUAL ONLY — slow, readable melee slash
+private playSlashArc(targetX: number, targetY: number) {
+  const gfx = this.scene.add.graphics();
+
+  const px = this.sprite.x;
+  const py = this.sprite.y;
+
+  const angle = Phaser.Math.Angle.Between(px, py, targetX, targetY);
+
+  const radius = 34;
+
+  gfx.setDepth(Math.max(py, targetY) + 6);
+  gfx.lineStyle(8, 0xffffff, 0.85);
+
+  const start = angle - Math.PI / 2.6;
+  const end = angle + Math.PI / 6;
+
+  gfx.beginPath();
+  gfx.arc(px, py, radius, start, end);
+  gfx.strokePath();
+
+  gfx.rotation = -0.25;
+
+  this.scene.tweens.add({
+    targets: gfx,
+    rotation: 0.2,
+    alpha: 0,
+    duration: 280,
+    ease: "Cubic.easeOut",
+    onComplete: () => gfx.destroy()
+  });
+}
+
+  
     // 🔑 called by ArenaScene when UI is shown
   disableInput() {
     this.inputEnabled = false;
