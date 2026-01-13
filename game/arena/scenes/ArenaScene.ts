@@ -305,6 +305,92 @@ export default class ArenaScene extends Phaser.Scene {
         this.enemies.spawnFudling(w / 2, h / 2);
         break;
 
+        case 4:
+        // Croakling intro (fast swarm)
+        this.enemies.spawnCroakling(200, 200);
+        this.enemies.spawnCroakling(w - 200, 200);
+        this.enemies.spawnCroakling(w / 2, h - 200);
+        this.enemies.spawnCroakling(w / 2, 200);
+        this.enemies.spawnHopGoblin(w / 2, h / 2);
+        this.enemies.spawnHopGoblin(200, h - 200);
+        break;
+
+      case 5:
+        // BOSS WAVE 1 — RugRat boss + adds
+        const boss5 = new RugRat(this, w / 2, h / 2);
+        boss5.maxHp *= 3;
+        boss5.hp = boss5.maxHp;
+        boss5.sprite.setScale(1.5);
+        this.enemies.enemies.push(boss5);
+
+        this.enemies.spawnHopGoblin(200, 200);
+        this.enemies.spawnHopGoblin(w - 200, 200);
+        break;
+
+      case 6:
+        // Post-boss escalation
+        this.enemies.spawnHopSlime(200, 180);
+        this.enemies.spawnHopSlime(w - 200, 180);
+        this.enemies.spawnCroakling(200, h - 200);
+        this.enemies.spawnCroakling(w - 200, h - 200);
+        this.enemies.spawnCroakling(w / 2, h / 2);
+        this.enemies.spawnFudling(w / 2, 180);
+        this.enemies.spawnFudling(w / 2, h - 180);
+        break;
+
+      case 7:
+        // Mixed threat
+        this.enemies.spawnRugRat(200, 200);
+        this.enemies.spawnRugRat(w - 200, 200);
+        this.enemies.spawnHopGoblin(w / 2, 180);
+        this.enemies.spawnHopGoblin(w / 2, h - 180);
+        this.enemies.spawnCroakling(200, h - 200);
+        this.enemies.spawnCroakling(w - 200, h - 200);
+        break;
+
+      case 8:
+        // Ranged + swarm chaos
+        this.enemies.spawnHopSlime(200, 180);
+        this.enemies.spawnHopSlime(w - 200, 180);
+        this.enemies.spawnHopSlime(w / 2, h - 180);
+
+        this.enemies.spawnCroakling(200, h / 2);
+        this.enemies.spawnCroakling(w - 200, h / 2);
+        this.enemies.spawnCroakling(w / 2, h / 2);
+        this.enemies.spawnCroakling(w / 2, 200);
+
+        this.enemies.spawnFudling(200, 200);
+        this.enemies.spawnFudling(w - 200, 200);
+        break;
+
+      case 9:
+        // Pre-boss pressure
+        this.enemies.spawnRugRat(200, 200);
+        this.enemies.spawnRugRat(w - 200, 200);
+
+        this.enemies.spawnHopSlime(w / 2, 180);
+        this.enemies.spawnHopSlime(w / 2, h - 180);
+
+        this.enemies.spawnHopGoblin(200, h - 200);
+        this.enemies.spawnHopGoblin(w - 200, h - 200);
+        break;
+
+      case 10:
+        // BIG BOSS WAVE
+        const boss10 = new RugRat(this, w / 2, h / 2);
+        boss10.maxHp *= 5;
+        boss10.hp = boss10.maxHp;
+        boss10.sprite.setScale(1.9);
+        this.enemies.enemies.push(boss10);
+
+        this.enemies.spawnHopSlime(200, 180);
+        this.enemies.spawnHopSlime(w - 200, 180);
+
+        this.enemies.spawnCroakling(200, h - 200);
+        this.enemies.spawnCroakling(w - 200, h - 200);
+        this.enemies.spawnCroakling(w / 2, h - 180);
+        break;
+
       default:
         this.spawnWave(3);
         break;
