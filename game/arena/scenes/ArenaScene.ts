@@ -376,11 +376,10 @@ export default class ArenaScene extends Phaser.Scene {
 
       case 10:
         // BIG BOSS WAVE
-        const boss10 = new RugRat(this, w / 2, h / 2);
+        const boss10 = this.enemies.spawnRugRat(w / 2, h / 2);
         boss10.maxHp *= 5;
         boss10.hp = boss10.maxHp;
         boss10.sprite.setScale(1.9);
-        this.enemies.enemies.push(boss10);
 
         this.enemies.spawnHopSlime(200, 180);
         this.enemies.spawnHopSlime(w - 200, 180);
