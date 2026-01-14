@@ -1,4 +1,6 @@
 export default function HomePage() {
+  const CA = "BZjZyo5Zr18iP6YJEuPaS3oy791GhMzatNxtXfMLpump";
+
   return (
     <main className="container">
       {/* HERO */}
@@ -26,8 +28,8 @@ export default function HomePage() {
           <a href="/arena" className="panel">
             <h3>The Arena</h3>
             <p>
-              Daily competitive battles with public leaderboards
-              and future rewards.
+              Competitive PvP battles with rankings,
+              ELO, and seasonal tournaments.
             </p>
           </a>
 
@@ -42,54 +44,62 @@ export default function HomePage() {
           <a href="/token" className="panel">
             <h3>The Token</h3>
             <p>
-              Utility-driven economics connecting
-              gameplay, competition, and rewards.
+              Live MegaGrok token powering rewards,
+              airdrops, and future utility.
             </p>
           </a>
         </div>
       </section>
 
       {/* ROADMAP */}
-<section style={{ marginTop: 64 }}>
-  <h2 className="section-title">Roadmap</h2>
-
-  <a href="/roadmap" className="panel">
-    <h3>MegaGrok Roadmap</h3>
-    <p>
-      Explore the planned evolution of the MegaGrok universe —
-      from core RPG systems to Arena expansion, lore, and ecosystem growth.
-    </p>
-
-    <p style={{ marginTop: 10, fontWeight: 700, color: "#ff7a00" }}>
-      → View the Roadmap
-    </p>
-  </a>
-</section>
-
-      {/* TOKENOMICS PLACEHOLDER */}
       <section style={{ marginTop: 64 }}>
-        <h2 className="section-title">Tokenomics</h2>
+        <h2 className="section-title">Roadmap</h2>
+
+        <a href="/roadmap" className="panel">
+          <h3>MegaGrok Roadmap</h3>
+          <p>
+            Explore the evolution of the MegaGrok universe —
+            RPG systems, Arena PvP, lore expansion, and ecosystem growth.
+          </p>
+
+          <p style={{ marginTop: 10, fontWeight: 700, color: "#ff7a00" }}>
+            → View the Roadmap
+          </p>
+        </a>
+      </section>
+
+      {/* TOKEN STATUS */}
+      <section style={{ marginTop: 64 }}>
+        <h2 className="section-title">MegaGrok Token — Live</h2>
 
         <div className="panel">
           <p>
-            Live tokenomics will be published here
-            once the MegaGrok token launches.
+            The MegaGrok token is now live.
+            Use the official contract address below.
           </p>
 
-          <p style={{ marginTop: 12, fontSize: 14, opacity: 0.75 }}>
-            This section will include:
-          </p>
+          <div
+            style={{
+              marginTop: 16,
+              padding: 12,
+              borderRadius: 8,
+              background: "rgba(0,0,0,0.4)",
+              fontSize: 13,
+              wordBreak: "break-all",
+            }}
+          >
+            <strong>Contract Address</strong>
+            <br />
+            {CA}
+          </div>
 
-          <ul style={{ marginTop: 12, paddingLeft: 18, opacity: 0.75 }}>
-            <li>Contract Address (CA)</li>
-            <li>Supply & allocation</li>
-            <li>Pump.fun link</li>
-            <li>Live token metrics</li>
-          </ul>
-
-          <p style={{ marginTop: 12, fontSize: 13, opacity: 0.6 }}>
-            No token has launched yet.
-            Details will be added transparently at launch.
+          <p style={{ marginTop: 12 }}>
+            <a
+              href="/token"
+              style={{ fontWeight: 700, color: "#ff7a00" }}
+            >
+              → View token details
+            </a>
           </p>
         </div>
       </section>
