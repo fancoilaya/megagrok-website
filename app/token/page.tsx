@@ -27,7 +27,7 @@ export default function TokenPage() {
 
       {/* LIVE TOKEN DATA (DEXSCREENER) */}
       <section style={{ marginTop: 56 }}>
-        <h2 className="section-title">Live Token Data (Example)</h2>
+        <h2 className="section-title">Live Token Data </h2>
 
         <div className="panel">
           <p style={{ marginBottom: 16, opacity: 0.8 }}>
