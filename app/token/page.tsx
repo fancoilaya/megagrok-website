@@ -16,12 +16,11 @@ export default function TokenPage() {
           <h3>Token Status</h3>
 
           <p style={{ marginTop: 8 }}>
-            The MegaGrok token has not yet launched.
+            The MegaGrok token is now live.
           </p>
 
           <p style={{ marginTop: 8, fontSize: 14, opacity: 0.75 }}>
-            Live market data below is shown using Solana (SOL)
-            as a placeholder example.
+            Live market data below 
           </p>
         </div>
       </section>
@@ -32,8 +31,7 @@ export default function TokenPage() {
 
         <div className="panel">
           <p style={{ marginBottom: 16, opacity: 0.8 }}>
-            This chart demonstrates how MegaGrok token data
-            will be displayed after launch.
+           $MegaGrok 
           </p>
 
           <div
@@ -46,7 +44,7 @@ export default function TokenPage() {
             }}
           >
             <iframe
-              src="https://dexscreener.com/solana/So11111111111111111111111111111111111111112?embed=1&theme=dark"
+              src="https://dexscreener.com/solana/ckmzgwbwaavqrgdwkbehmuwch6dva7zrm5nbue9kuvzz?embed=1&theme=dark"
               width="100%"
               height="100%"
               frameBorder="0"
@@ -54,11 +52,7 @@ export default function TokenPage() {
             />
           </div>
 
-          <p style={{ marginTop: 12, fontSize: 13, opacity: 0.65 }}>
-            Placeholder data shown using SOL.
-            This will be replaced with the MegaGrok token
-            at launch.
-          </p>
+
         </div>
       </section>
 
