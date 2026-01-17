@@ -51,7 +51,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* TOKEN SPOTLIGHT */}
+{/* TOKEN SPOTLIGHT */}
 <section style={{ marginTop: 64 }}>
   <h2 className="section-title">🚀 MegaGrok Token — LIVE</h2>
 
@@ -67,39 +67,82 @@ export default function HomePage() {
       Always verify the contract address below.
     </p>
 
+    {/* CA BOX */}
     <div
       style={{
         marginTop: 16,
         padding: 16,
         borderRadius: 10,
-        background: "rgba(0,0,0,0.6)",
-        fontSize: 14,
-        fontWeight: 700,
+        background: "rgba(0,0,0,0.65)",
+        border: "1px solid rgba(255,122,0,0.6)",
         wordBreak: "break-all",
-        border: "1px solid rgba(255,122,0,0.5)",
+        fontWeight: 700,
+        fontSize: 14,
       }}
+      id="megagrok-ca"
     >
       BZjZyo5Zr18iP6YJEuPaS3oy791GhMzatNxtXfMLpump
     </div>
 
-    <p style={{ marginTop: 12, fontSize: 13, opacity: 0.8 }}>
-      Chain: Solana · Launch: Pump.fun
-    </p>
-
-    <div style={{ marginTop: 16 }}>
-      <a
-        href="/token"
+    {/* ACTION BUTTONS */}
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        flexWrap: "wrap",
+        marginTop: 16,
+      }}
+    >
+      {/* COPY BUTTON */}
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(
+            "BZjZyo5Zr18iP6YJEuPaS3oy791GhMzatNxtXfMLpump"
+          );
+          alert("Contract address copied!");
+        }}
         style={{
-          fontWeight: 700,
-          color: "#ff7a00",
-          fontSize: 15,
+          padding: "10px 16px",
+          borderRadius: 8,
+          background: "#ff7a00",
+          color: "#000",
+          fontWeight: 800,
+          border: "none",
+          cursor: "pointer",
         }}
       >
-        → View token details
+        📋 Copy CA
+      </button>
+
+      {/* PUMP.FUN LINK */}
+      <a
+        href="https://pump.fun/coin/BZjZyo5Zr18iP6YJEuPaS3oy791GhMzatNxtXfMLpump"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          padding: "10px 16px",
+          borderRadius: 8,
+          background: "rgba(255,122,0,0.15)",
+          border: "2px solid #ff7a00",
+          color: "#ff7a00",
+          fontWeight: 800,
+          textDecoration: "none",
+        }}
+      >
+        🔗 View on Pump.fun
       </a>
     </div>
+
+    <p style={{ marginTop: 12, fontSize: 13, opacity: 0.75 }}>
+      Chain: Solana · Launch platform: Pump.fun
+    </p>
+
+    <p style={{ marginTop: 8, fontSize: 12, opacity: 0.6 }}>
+      ⚠️ Only trust this contract address. Beware of impostors.
+    </p>
   </div>
 </section>
+
 
 
       {/* ROADMAP */}
