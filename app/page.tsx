@@ -1,3 +1,5 @@
+"use client";
+
 export default function HomePage() {
   const CA = "BZjZyo5Zr18iP6YJEuPaS3oy791GhMzatNxtXfMLpump";
 
