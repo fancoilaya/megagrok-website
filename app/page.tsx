@@ -119,41 +119,7 @@ export default function HomePage() {
         </a>
       </section>
 
-      {/* TOKEN STATUS */}
-      <section style={{ marginTop: 64 }}>
-        <h2 className="section-title">MegaGrok Token — Live</h2>
-
-        <div className="panel">
-          <p>
-            The MegaGrok token is now live.
-            Use the official contract address below.
-          </p>
-
-          <div
-            style={{
-              marginTop: 16,
-              padding: 12,
-              borderRadius: 8,
-              background: "rgba(0,0,0,0.4)",
-              fontSize: 13,
-              wordBreak: "break-all",
-            }}
-          >
-            <strong>Contract Address</strong>
-            <br />
-            {CA}
-          </div>
-
-          <p style={{ marginTop: 12 }}>
-            <a
-              href="/token"
-              style={{ fontWeight: 700, color: "#ff7a00" }}
-            >
-              → View token details
-            </a>
-          </p>
-        </div>
-      </section>
+     
     </main>
   );
 }
