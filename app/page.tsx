@@ -51,6 +51,57 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* TOKEN SPOTLIGHT */}
+<section style={{ marginTop: 64 }}>
+  <h2 className="section-title">🚀 MegaGrok Token — LIVE</h2>
+
+  <div
+    className="panel"
+    style={{
+      border: "3px solid #ff7a00",
+      boxShadow: "0 0 30px rgba(255,122,0,0.35)",
+    }}
+  >
+    <p style={{ fontSize: 16, marginBottom: 12 }}>
+      The official MegaGrok token is now live.
+      Always verify the contract address below.
+    </p>
+
+    <div
+      style={{
+        marginTop: 16,
+        padding: 16,
+        borderRadius: 10,
+        background: "rgba(0,0,0,0.6)",
+        fontSize: 14,
+        fontWeight: 700,
+        wordBreak: "break-all",
+        border: "1px solid rgba(255,122,0,0.5)",
+      }}
+    >
+      BZjZyo5Zr18iP6YJEuPaS3oy791GhMzatNxtXfMLpump
+    </div>
+
+    <p style={{ marginTop: 12, fontSize: 13, opacity: 0.8 }}>
+      Chain: Solana · Launch: Pump.fun
+    </p>
+
+    <div style={{ marginTop: 16 }}>
+      <a
+        href="/token"
+        style={{
+          fontWeight: 700,
+          color: "#ff7a00",
+          fontSize: 15,
+        }}
+      >
+        → View token details
+      </a>
+    </div>
+  </div>
+</section>
+
+
       {/* ROADMAP */}
       <section style={{ marginTop: 64 }}>
         <h2 className="section-title">Roadmap</h2>
